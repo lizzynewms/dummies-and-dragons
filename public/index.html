@@ -1,0 +1,1256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0c0814">
+<meta name="description" content="A Jackbox-style comedy D&D one-shot. One TV, up to six phones, an AI dungeon master with no filter.">
+<title>Dummies & Dragons</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,3 93,27 93,73 50,97 7,73 7,27' fill='%23ff4fb8'/%3E%3Ctext x='50' y='64' font-size='38' text-anchor='middle' font-family='Georgia' font-weight='bold' fill='%231a0f24'%3E20%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Chakra+Petch:wght@400;500;600;700&family=VT323&display=swap">
+<style>
+/* Layout: one-screen app. TV = header / stage + party rail. Phone = stacked controller with sticky action bar. */
+:root{
+  color-scheme: dark;
+  --void:#0c0814; --crypt:#171024; --stone:#251b37; --seam:#3a2d52;
+  --chrome:#ece9f6; --dim:#a69cc0; --hex:#ff4fb8; --mead:#ffcf5a;
+  --ok:#7dffb0; --bad:#ff5d6c;
+  --holo:linear-gradient(115deg,#7ff3ff 0%,#c9a7ff 30%,#ff9ad5 55%,#ffe58a 75%,#9dffcf 100%);
+  --p1:#ff4fb8; --p2:#7ff3ff; --p3:#d8ff8a; --p4:#ffcf5a; --p5:#c9a7ff; --p6:#ff8a5c;
+  --f-black:"UnifrakturCook","Pirata One","Old English Text MT",Georgia,serif;
+  --f-body:"Chakra Petch","Segoe UI",system-ui,sans-serif;
+  --f-mono:"VT323",ui-monospace,"Courier New",monospace;
+  --r:14px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);background:#0c0814}
+[hidden]{display:none!important}
+img{max-width:100%}
+html,body{height:100%}
+body{margin:0;background:var(--void);color:var(--chrome);font-family:var(--f-body);font-size:16px;line-height:1.5;
+  background-image:radial-gradient(1200px 700px at 15% -10%,#3b1a5c 0%,transparent 60%),radial-gradient(900px 600px at 110% 110%,#4a1238 0%,transparent 55%),radial-gradient(1px 1px at 20px 30px,#fff6 50%,transparent 51%),radial-gradient(1px 1px at 120px 80px,#fff4 50%,transparent 51%),radial-gradient(1.5px 1.5px at 70px 160px,#ffd6f080 50%,transparent 51%);
+  background-size:auto,auto,190px 190px,240px 240px,310px 310px;background-attachment:fixed;overflow-x:hidden}
+#grain{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50;opacity:.13;mix-blend-mode:overlay;image-rendering:pixelated}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:49;background:radial-gradient(ellipse at center,transparent 55%,#000a 100%),repeating-linear-gradient(0deg,#0000 0 2px,#0000000f 2px 3px)}
+#app{position:relative;z-index:1;min-height:100%;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px;box-sizing:border-box}
+h1,h2,h3{font-family:var(--f-black);font-weight:700;margin:0;text-wrap:balance;letter-spacing:.01em}
+.chrome{background:linear-gradient(180deg,#fff 0%,#e3e0ef 38%,#6b6382 50%,#d9d4ea 62%,#fff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 #00000080) drop-shadow(0 0 18px #ff4fb855)}
+.holo-text{background:var(--holo);-webkit-background-clip:text;background-clip:text;color:transparent}
+.mono{font-family:var(--f-mono);letter-spacing:.06em}
+.label{font-family:var(--f-mono);font-size:1.15rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.panel{background:linear-gradient(var(--crypt),var(--crypt)) padding-box,var(--holo) border-box;border:2px solid transparent;border-radius:var(--r);box-shadow:0 10px 40px #0008,inset 0 1px 0 #ffffff14}
+.slab{background:#ffffff08;border:1px solid var(--seam);border-radius:10px}
+.btn{appearance:none;border:0;cursor:pointer;font-family:var(--f-mono);font-size:1.35rem;letter-spacing:.1em;text-transform:uppercase;color:#1a0f24;padding:.55em 1.3em;border-radius:999px;
+  background:linear-gradient(180deg,#fff9 0%,#fff0 48%) ,var(--holo);box-shadow:0 0 0 2px #0006,0 6px 0 #5b2a6e,0 10px 24px #ff4fb840;transition:transform .08s, filter .15s}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:translateY(3px);box-shadow:0 0 0 2px #0006,0 3px 0 #5b2a6e}
+.btn:disabled{filter:grayscale(1) brightness(.6);cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--chrome);box-shadow:inset 0 0 0 2px var(--seam)}
+.btn.small{font-size:1.05rem;padding:.35em .9em}
+.btn.big{font-size:2rem;padding:.5em 1.6em}
+:focus-visible{outline:3px solid var(--mead);outline-offset:3px}
+input,textarea,select{font:inherit;color:var(--chrome);background:#0006;border:2px solid var(--seam);border-radius:10px;padding:.65em .8em;width:100%;box-sizing:border-box}
+input:focus,textarea:focus{border-color:var(--hex);outline:none;box-shadow:0 0 0 3px #ff4fb833}
+textarea{resize:vertical;min-height:5.5em}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{appearance:none;cursor:pointer;font:inherit;font-size:.95rem;color:var(--chrome);background:#ffffff0a;border:1.5px solid var(--seam);border-radius:999px;padding:.35em .85em}
+.chip[aria-pressed="true"]{background:var(--holo);color:#1a0f24;border-color:transparent;font-weight:700}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.stack{display:flex;flex-direction:column;gap:14px}
+.muted{color:var(--dim)}
+.sparkle::before,.sparkle::after{content:"\2726";color:var(--mead);margin:0 .4em;font-size:.7em;vertical-align:middle}
+.err{color:var(--bad)}
+
+/* ---------- title / mode select ---------- */
+.title-screen{max-width:760px;margin:4vh auto 0;display:flex;flex-direction:column;gap:22px;align-items:center;text-align:center}
+.logo{font-size:clamp(3.4rem,13vw,7.5rem);line-height:.9}
+.tagline{font-family:var(--f-mono);font-size:1.4rem;letter-spacing:.14em;color:var(--hex);text-transform:uppercase}
+.mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;width:100%}
+.mode-grid .panel{padding:22px;display:flex;flex-direction:column;gap:12px;text-align:left}
+.mode-grid h2{font-size:2rem}
+
+/* ---------- TV ---------- */
+.tv{display:grid;grid-template-rows:auto 1fr;gap:14px;min-height:calc(100vh - 32px)}
+.tv-head{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.tv-head .logo{font-size:2.2rem}
+.advtitle{font-family:var(--f-black);font-size:1.6rem;flex:1;min-width:0}
+.pips{display:flex;gap:6px;align-items:center}
+.pip{width:12px;height:12px;border-radius:3px;transform:rotate(45deg);background:var(--seam)}
+.pip.done{background:var(--mead)} .pip.now{background:var(--hex);box-shadow:0 0 10px var(--hex)}
+.codebox{font-family:var(--f-mono);font-size:1.3rem;padding:.2em .7em;border-radius:8px;border:1.5px solid var(--seam)}
+.codebox b{font-size:1.6rem;color:var(--mead);letter-spacing:.2em}
+.timer{font-family:var(--f-mono);font-size:2.2rem;min-width:3ch;text-align:right;color:var(--mead)}
+.timer.hot{color:var(--bad);animation:throb .6s infinite}
+@keyframes throb{50%{transform:scale(1.12)}}
+.tv-body{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+.tv-body.solo{grid-template-columns:minmax(0,1fr)}
+@media (max-width:900px){.tv-body{grid-template-columns:minmax(0,1fr)}}
+.stage{padding:26px clamp(18px,3vw,40px);min-height:60vh;display:flex;flex-direction:column;gap:20px}
+.nar{font-size:clamp(1.15rem,1.7vw,1.55rem);line-height:1.55;max-width:62ch}
+.nar p{margin:0 0 .8em}
+.nar .caret{display:inline-block;width:.55em;height:1em;background:var(--hex);vertical-align:-.12em;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.question{font-family:var(--f-black);font-size:clamp(1.8rem,3.4vw,2.8rem);line-height:1.1}
+.qwrap{border-top:1px dashed var(--seam);padding-top:16px;display:flex;flex-direction:column;gap:6px}
+.party{display:flex;flex-direction:column;gap:10px}
+.pcard{padding:12px 14px;border-radius:12px;background:#ffffff08;border:1.5px solid var(--seam);border-left:6px solid var(--pc,var(--hex));display:flex;flex-direction:column;gap:4px}
+.pcard .nm{font-weight:700;font-size:1.05rem;line-height:1.2}
+.pcard .sub{font-size:.85rem;color:var(--dim)}
+.hpbar{height:8px;border-radius:99px;background:#0008;overflow:hidden;border:1px solid #ffffff1a}
+.hpbar i{display:block;height:100%;background:linear-gradient(90deg,var(--bad),var(--mead) 50%,var(--ok));background-size:300% 100%;transition:width .6s}
+.pcard.down{opacity:.55;filter:grayscale(.7)}
+.tag{font-family:var(--f-mono);font-size:1rem;letter-spacing:.08em;padding:0 .45em;border-radius:6px;background:#ffffff14}
+.tag.insp{background:var(--mead);color:#1a0f24}
+.seats{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.seat{padding:14px;border-radius:12px;border:2px dashed var(--seam);min-height:64px;display:flex;align-items:center;gap:10px;font-weight:600}
+.seat.filled{border-style:solid;border-color:var(--pc);background:#ffffff08}
+.dot{width:14px;height:14px;border-radius:50%;background:var(--pc,var(--hex));flex:none;box-shadow:0 0 10px var(--pc,var(--hex))}
+.bigcode{font-family:var(--f-mono);font-size:clamp(4rem,12vw,8rem);line-height:1;letter-spacing:.18em}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.opt{padding:16px;border-radius:14px;background:#ffffff0a;border:2px solid var(--seam);display:flex;flex-direction:column;gap:8px;position:relative}
+.opt .L{font-family:var(--f-black);font-size:2.2rem;line-height:1;color:var(--mead)}
+.opt .t{font-size:1.15rem;font-weight:600}
+.opt .by{font-size:.85rem;color:var(--dim)}
+.opt.win{border-color:var(--mead);box-shadow:0 0 0 2px var(--mead),0 0 40px #ffcf5a55;transform:scale(1.02)}
+.opt.lose{opacity:.4}
+.ck{font-family:var(--f-mono);font-size:1.05rem;color:var(--hex)}
+.votes{display:flex;gap:4px;min-height:14px}
+.votes i{width:12px;height:12px;border-radius:50%;background:var(--pc)}
+.done-list{display:flex;flex-wrap:wrap;gap:8px}
+.done-list span{padding:.25em .7em;border-radius:999px;border:1.5px solid var(--pc);font-size:.95rem}
+.done-list span.in{background:var(--pc);color:#1a0f24;font-weight:700}
+.words{display:flex;flex-wrap:wrap;gap:12px}
+.word{padding:12px 16px;border-radius:12px;background:#ffffff0c;border:1.5px solid var(--seam);max-width:320px;animation:pop .5s backwards}
+.word b{display:block;font-size:1.3rem}
+.word small{color:var(--dim)}
+@keyframes pop{from{transform:scale(.6) rotate(-4deg);opacity:0}}
+.foe{display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:14px;border:2px solid var(--bad);background:#ff5d6c12}
+.foe h3{font-size:2rem}
+.foe .hpbar{height:16px}
+.foe .hpbar i{background:var(--bad)}
+.ccards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.ccard{padding:16px;border-radius:14px;background:#ffffff0a;border:2px solid var(--pc);display:flex;flex-direction:column;gap:6px;animation:pop .5s backwards}
+.ccard h3{font-size:1.7rem;line-height:1.05}
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;text-align:center}
+.stats div{background:#0006;border-radius:8px;padding:4px 0;line-height:1.1}
+.stats b{display:block;font-size:1.05rem} .stats small{font-family:var(--f-mono);color:var(--dim);font-size:.95rem}
+.controls{position:fixed;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;z-index:60}
+
+/* d20 */
+.d20wrap{display:flex;flex-direction:column;align-items:center;gap:10px;margin:8px auto}
+.d20{width:min(260px,60vw);aspect-ratio:1;max-width:100%;position:relative;display:grid;place-items:center}
+.d20 svg{position:absolute;inset:0;width:100%;height:100%}
+.d20 .n{position:relative;font-family:var(--f-black);font-size:5.2rem;line-height:1;color:#1a0f24;text-shadow:0 1px 0 #fff8}
+.d20.rolling svg{animation:spin .35s linear infinite}
+.d20.idle svg{animation:bob 2.4s ease-in-out infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes bob{50%{transform:translateY(-8px) rotate(6deg)}}
+.result{font-family:var(--f-black);font-size:clamp(2.2rem,5vw,3.6rem);text-align:center;line-height:1.05}
+.result.success{color:var(--ok)} .result.fail{color:var(--bad)}
+.result.crit{animation:rainbow 1.2s linear infinite;background:var(--holo);-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200% 100%}
+.result.fumble{color:var(--bad);animation:shake .4s 3}
+@keyframes rainbow{to{background-position:200% 0}}
+@keyframes shake{25%{transform:translateX(-8px) rotate(-2deg)}75%{transform:translateX(8px) rotate(2deg)}}
+.math{font-family:var(--f-mono);font-size:1.6rem;text-align:center;color:var(--dim)}
+
+/* thinking */
+.think{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;text-align:center;min-height:52vh}
+.orb{width:min(220px,50vw);aspect-ratio:1;border-radius:50%;background:conic-gradient(from 0deg,#7ff3ff,#c9a7ff,#ff9ad5,#ffe58a,#9dffcf,#7ff3ff);filter:blur(1px) saturate(1.2);animation:spin 3s linear infinite;box-shadow:0 0 80px #ff4fb877,inset 0 0 40px #fff;position:relative}
+.orb::after{content:"";position:absolute;inset:14%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0%,#2a1640 45%,#0c0814 100%)}
+.think .line{font-family:var(--f-mono);font-size:1.7rem;letter-spacing:.08em;color:var(--mead);min-height:1.5em}
+@media (prefers-reduced-motion:reduce){*{animation-duration:0s!important;animation-iteration-count:1!important}}
+
+/* ---------- PHONE ---------- */
+.phone{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:16px;padding-bottom:90px}
+.phead{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.phead .logo{font-size:1.7rem}
+.me{display:flex;align-items:center;gap:8px;font-weight:600;min-width:0}
+.me span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card{padding:18px}
+.ptitle{font-family:var(--f-black);font-size:2rem;line-height:1.05}
+.pq{font-family:var(--f-black);font-size:1.6rem;line-height:1.15}
+.optbtn{appearance:none;text-align:left;font:inherit;color:var(--chrome);cursor:pointer;padding:14px;border-radius:14px;background:#ffffff0a;border:2px solid var(--seam);display:flex;gap:12px;align-items:flex-start;width:100%}
+.optbtn .L{font-family:var(--f-black);font-size:1.8rem;line-height:1;color:var(--mead)}
+.optbtn[aria-pressed="true"]{border-color:var(--hex);background:#ff4fb81f;box-shadow:0 0 0 2px var(--hex)}
+.optbtn small{display:block;color:var(--dim);margin-top:4px}
+details.sheet{padding:12px 14px}
+details.sheet summary{cursor:pointer;font-family:var(--f-mono);font-size:1.2rem;letter-spacing:.1em;text-transform:uppercase}
+.kv{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.92rem}
+.kv b{color:var(--mead)}
+.classgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.classgrid .chip{border-radius:12px;text-align:left;padding:.5em .7em;display:flex;flex-direction:column;gap:2px}
+.classgrid .chip small{font-size:.78rem;opacity:.8;font-weight:400}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));background:linear-gradient(180deg,#0c081400,#0c0814 35%);z-index:40;display:flex;justify-content:center}
+.bar .btn{width:min(520px,100%)}
+.waiting{font-family:var(--f-mono);font-size:1.5rem;color:var(--mead);text-align:center;letter-spacing:.06em}
+.counter{font-family:var(--f-mono);color:var(--dim);text-align:right}
+.toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:70;padding:.5em 1em;border-radius:10px;background:var(--stone);border:1.5px solid var(--hex);font-family:var(--f-mono);font-size:1.2rem;max-width:90vw}
+.qr{width:clamp(150px,18vw,230px);flex:none;border-radius:12px;overflow:hidden;box-shadow:0 0 0 3px var(--hex),0 0 30px #ff4fb855}.qr:empty{display:none}.qr svg{display:block;width:100%;height:auto}
+.conn{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:70;padding:.3em .9em;border-radius:999px;background:var(--bad);color:#1a0f24;font-family:var(--f-mono);font-size:1.1rem;letter-spacing:.08em}
+</style>
+</head>
+<body>
+<canvas id="grain" width="160" height="160" aria-hidden="true"></canvas>
+<div id="app"></div>
+<div id="toast" class="toast" hidden></div>
+<div id="conn" class="conn" hidden role="status">Reconnecting&hellip;</div>
+
+<script src="/qrcode.js"></script>
+<script>
+/* =========================================================
+   DUMMIES & DRAGONS — host TV + phone controller, AI dungeon master
+   ========================================================= */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const store = {
+  get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  del(k){ try { localStorage.removeItem(k); } catch {} }
+};
+const rnd = n => Math.floor(Math.random()*n);
+const pick = a => a[rnd(a.length)];
+const shuffle = a => { a = a.slice(); for (let i=a.length-1;i>0;i--){ const j=rnd(i+1); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const die = n => 1 + rnd(n);
+const amod = s => Math.floor((s-10)/2);
+const sgn = n => (n>=0?'+':'') + n;
+const clamp = (n,a,b) => Math.max(a, Math.min(b, n));
+const clip = (s, n) => { s = String(s ?? '').replace(/[\u0000-\u0009\u000B-\u001F\u200B-\u200F\u2028-\u202E\u2060-\u206F]/g,'').trim(); return s.length > n ? s.slice(0, n-1).trimEnd() + '\u2026' : s; };
+const uid = () => 'p' + Math.random().toString(36).slice(2,10);
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(()=>t.hidden=true,2600); }
+
+/* ---------------- RULES DATA (5e-lite, level 3) ---------------- */
+const ABIL = ['STR','DEX','CON','INT','WIS','CHA'];
+const SKILLS = {Athletics:'STR',Acrobatics:'DEX','Sleight of Hand':'DEX',Stealth:'DEX',Arcana:'INT',History:'INT',Investigation:'INT',Nature:'INT',Religion:'INT','Animal Handling':'WIS',Insight:'WIS',Medicine:'WIS',Perception:'WIS',Survival:'WIS',Deception:'CHA',Intimidation:'CHA',Performance:'CHA',Persuasion:'CHA'};
+const RACES = {
+  'Human':     {b:{STR:1,DEX:1,CON:1,INT:1,WIS:1,CHA:1}, t:'Aggressively average. +1 to everything.'},
+  'Elf':       {b:{DEX:2,INT:1}, t:'Pointy ears, long life, longer opinions.'},
+  'Dwarf':     {b:{CON:2,STR:1}, t:'Built like a beer keg. Drinks like one.'},
+  'Halfling':  {b:{DEX:2,CHA:1}, t:'Small, lucky, eats seven meals a day.'},
+  'Half-Orc':  {b:{STR:2,CON:1}, t:'Tusks, muscles, surprisingly good poetry.'},
+  'Tiefling':  {b:{CHA:2,INT:1}, t:'Horns, tail, family trauma from hell.'},
+  'Gnome':     {b:{INT:2,DEX:1}, t:'Tiny genius. Loud. Probably built a bomb.'},
+  'Dragonborn':{b:{STR:2,CHA:1}, t:'Breathes elemental fire. Bad at whispering.'},
+  'Goblin':    {b:{DEX:2,CON:1}, t:'Scrappy, sneaky, will bite.'},
+  'Tabaxi':    {b:{DEX:2,CHA:1}, t:'Cat person. Literally. Knocks things off tables.'}
+};
+const CLASSES = {
+  Fighter:  {hd:10,ac:16,arr:{STR:15,CON:14,DEX:13,WIS:12,CHA:10,INT:8},sk:['Athletics','Intimidation','Perception'],atk:'STR',dmg:[10],moves:['Second Wind','Action Surge'],blurb:'Hits things. Very good at it.'},
+  Barbarian:{hd:12,ac:14,arr:{STR:15,CON:14,DEX:13,WIS:12,CHA:10,INT:8},sk:['Athletics','Intimidation','Survival'],atk:'STR',dmg:[12],moves:['Rage','Reckless Attack'],blurb:'Anger management dropout.'},
+  Rogue:    {hd:8, ac:14,arr:{DEX:15,CON:14,CHA:13,INT:12,WIS:10,STR:8},sk:['Stealth','Sleight of Hand','Deception','Acrobatics'],atk:'DEX',dmg:[6,6,6],moves:['Sneak Attack','Cunning Action'],blurb:'Stabs from behind. Steals your wallet.'},
+  Ranger:   {hd:10,ac:14,arr:{DEX:15,WIS:14,CON:13,STR:12,INT:10,CHA:8},sk:['Survival','Perception','Stealth','Nature'],atk:'DEX',dmg:[8,6],moves:["Hunter's Mark",'Favored Foe'],blurb:'Lives in the woods. Smells like it.'},
+  Wizard:   {hd:6, ac:12,arr:{INT:15,CON:14,DEX:13,WIS:12,CHA:10,STR:8},sk:['Arcana','History','Investigation'],atk:'INT',dmg:[10],moves:['Fire Bolt','Shield','Magic Missile'],blurb:'Read a book once. Never shuts up about it.'},
+  Sorcerer: {hd:6, ac:12,arr:{CHA:15,CON:14,DEX:13,WIS:12,INT:10,STR:8},sk:['Arcana','Persuasion','Intimidation'],atk:'CHA',dmg:[8,6],moves:['Chaos Bolt','Wild Magic Surge'],blurb:'Born magic. Zero self-control.'},
+  Warlock:  {hd:8, ac:13,arr:{CHA:15,CON:14,DEX:13,WIS:12,INT:10,STR:8},sk:['Deception','Intimidation','Arcana'],atk:'CHA',dmg:[10],moves:['Eldritch Blast','Hex'],blurb:'Signed a contract without reading it.'},
+  Cleric:   {hd:8, ac:18,arr:{WIS:15,CON:14,STR:13,CHA:12,INT:10,DEX:8},sk:['Medicine','Religion','Insight'],atk:'WIS',dmg:[8],moves:['Sacred Flame','Healing Word','Turn Undead'],blurb:'God on speed dial. God screens calls.'},
+  Paladin:  {hd:10,ac:18,arr:{STR:15,CHA:14,CON:13,WIS:12,DEX:10,INT:8},sk:['Athletics','Persuasion','Religion'],atk:'STR',dmg:[8,8],moves:['Divine Smite','Lay on Hands'],blurb:'Holy knight. Insufferable at parties.'},
+  Druid:    {hd:8, ac:14,arr:{WIS:15,CON:14,DEX:13,INT:12,CHA:10,STR:8},sk:['Nature','Animal Handling','Medicine'],atk:'WIS',dmg:[6,6],moves:['Wild Shape','Thorn Whip'],blurb:'Can turn into a bear. Mostly turns into a rat.'},
+  Monk:     {hd:8, ac:14,arr:{DEX:15,WIS:14,CON:13,STR:12,CHA:10,INT:8},sk:['Acrobatics','Stealth','Insight'],atk:'DEX',dmg:[6,4],moves:['Flurry of Blows','Patient Defense'],blurb:'Punches very fast. Owns one robe.'},
+  Bard:     {hd:8, ac:13,arr:{CHA:15,DEX:14,CON:13,WIS:12,INT:10,STR:8},sk:['Performance','Persuasion','Deception','Insight'],atk:'CHA',dmg:[6,4],moves:['Vicious Mockery','Bardic Inspiration','Cutting Words'],blurb:'Will try to seduce the dragon.'}
+};
+function sheet(ch){
+  const c = CLASSES[ch.cl] || CLASSES.Fighter, r = RACES[ch.rc] || RACES.Human;
+  const st = {}; ABIL.forEach(a => st[a] = (c.arr[a]||10) + (r.b[a]||0));
+  const hp = c.hd + 2*(c.hd/2+1) + 3*amod(st.CON);
+  return {st, hp: Math.max(8,hp), ac: c.ac, cls:c, prof:2};
+}
+function checkMod(ch, skill){
+  const s = sheet(ch); const ab = SKILLS[skill] || (ABIL.includes(skill) ? skill : 'DEX');
+  return amod(s.st[ab]) + (s.cls.sk.includes(skill) ? 2 : 0);
+}
+function atkMod(ch){ const s = sheet(ch); return amod(s.st[s.cls.atk]) + 2; }
+
+const PROMPTS = [
+  'A horrible name for a tavern','The worst sandwich imaginable','The sexiest masculine name','A deeply cursed household object',
+  "An embarrassing medical condition for a wizard","A villain's stupid catchphrase",'The noise you make sitting on a hedgehog','The name of a goblin crime boss',
+  'A food that should never be fermented','The title of a forbidden spellbook',"Something found in a dead noble's pockets",'A terrible name for a horse',
+  "The town's least popular law",'A weird thing to worship as a god',"What the bard's lower-back tattoo says",'A legendary sword with a dumb name',
+  'The most suspicious potion flavor','A disgusting regional delicacy','A sexy, morally bankrupt baron',"The secret ingredient in the barkeep's stew",
+  'The worst thing to yell during a sword fight','A mildly cursed hat','An insult your grandma would use',"A dragon's emotional support animal",
+  'The most unhinged guild in town','Something the king is secretly addicted to',"A nickname for the party's least useful member","A dying troll's last words",
+  'A body part that should never glow','The name of a haunted outhouse','A rumor about the local priest','The worst possible wedding gift'
+];
+const FRAMEWORKS = [
+  {id:'lastcall', name:'Last Call', pitch:'Your favorite dive tavern is being repossessed by a crime boss. Steal the deed back before closing time.',
+    acts:['chaos in the tavern as the crime boss\'s goons arrive to collect','infiltrating the crime boss\'s disgusting lair across town','the vault showdown where the deed is kept'],
+    boss:'the crime boss in a ridiculous suit of gilded armor, plus their pet monstrosity'},
+  {id:'wedding', name:"Til Undeath Do Us Part", pitch:'You are hired as caterers-slash-security for a noble wedding. The groom is very obviously a vampire.',
+    acts:['wedding prep chaos and suspicious guests','the reception goes horribly wrong','the altar of blood in the crypt beneath the chapel'],
+    boss:'the vampire groom at full fangs, with a choir of undead bridesmaids'},
+  {id:'goblins', name:'The Goblin Tax Revolt', pitch:"The goblins unionized and seized the toll bridge. The mayor wants it back. The goblins have demands.",
+    acts:['tense negotiations at the bridge','sneaking into the goblin warrens under the hills','the strike captain\'s war-wagon throne'],
+    boss:'the goblin strike captain riding a war-wagon pulled by angry geese'},
+  {id:'cheese', name:"The Mayor's Cheese", pitch:'The town\'s prize-winning cheese wheel has become sentient and is mind-controlling the market.',
+    acts:['panic and cultists in the market square','descending into the reeking cheese caves','the throne of the Cheese God, ripened over centuries'],
+    boss:'the Cheese God, a towering wheel of sentient brie with many mouths'}
+];
+const NAME_A = ['Grumbo','Thessaly','Bartholomew','Vex','Doug','Moira','Pip','Ragna','Esmeralda','Krug','Fennick','Delphine','Barnaby','Zug-Zug','Tamsin','Horace','Ylva','Brother Kevin','Lady Gristle','Sir Loin'];
+const NAME_B = ['Ashpants','Wetsock','the Moist','Bonebiscuit','Gravelthroat','Sweatsworth','Tankardson','Greasewick','the Unwashed','Butterknuckle','Dampwhistle','of No Fixed Abode','Mudflap','Crumbhorn'];
+const LOOKS = ['a towering mess of scars and regret wearing one (1) boot','smells faintly of soup; cape is a stolen bedsheet','tiny, furious, mustache longer than their body',
+  'glitter eyeshadow, chainmail crop top, zero shame','looks like a disappointed librarian who lifts','covered in tattoos of ex-lovers\' names, most crossed out',
+  'one eye, two eyepatches, nobody asks','dressed head to toe in leather that is clearly too tight'];
+const THINK_LINES = ['Rolling behind the screen','Consulting the Monster Manual','Pretending this was planned','Doing a funny voice','Inventing a tavern menu','Checking the rules (ignoring them)','Sharpening the dice','Hiding a mimic somewhere','Asking the gods for a vibe check','Nerfing your plan'];
+const SEAT_COLORS = ['var(--p1)','var(--p2)','var(--p3)','var(--p4)','var(--p5)','var(--p6)'];
+const LENGTHS = {quick:{n:6,label:'Quick',time:'about 45 min'}, standard:{n:9,label:'Standard',time:'about 75 min'}, epic:{n:12,label:'Epic',time:'up to 2 hours'}};
+
+/* ---------------- FILM GRAIN ---------------- */
+(function grain(){
+  const c = $('#grain'), x = c.getContext('2d'); const img = x.createImageData(160,160);
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function frame(){ const d=img.data; for(let i=0;i<d.length;i+=4){ const v=rnd(255); d[i]=d[i+1]=d[i+2]=v; d[i+3]=255; } x.putImageData(img,0,0); }
+  frame(); if(!still) setInterval(frame, 90);
+})();
+
+/* ---------------- AUDIO (procedural, starts on a click) ---------------- */
+const Sound = (() => {
+  let ctx, master, mus, sfx, dl, mode = 'off', timer, nextT = 0, step = 0;
+  let muted = !!store.get('rfs-mute');
+  const hz = m => 440*Math.pow(2,(m-69)/12);
+  function init(){
+    if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return; }
+    try { ctx = new (window.AudioContext||window.webkitAudioContext)(); } catch { return; }
+    master = ctx.createGain(); master.gain.value = muted ? 0 : .75; master.connect(ctx.destination);
+    dl = ctx.createDelay(); dl.delayTime.value = .27; const fb = ctx.createGain(); fb.gain.value = .3; const wet = ctx.createGain(); wet.gain.value = .3;
+    dl.connect(fb); fb.connect(dl); dl.connect(wet); wet.connect(master);
+    mus = ctx.createGain(); mus.gain.value = .5; mus.connect(master); mus.connect(dl);
+    sfx = ctx.createGain(); sfx.gain.value = .8; sfx.connect(master); sfx.connect(dl);
+  }
+  function tone(t,f,dur,type,vol,dest,att=.005){ const o=ctx.createOscillator(),g=ctx.createGain(); o.type=type; o.frequency.setValueAtTime(f,t); g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+att); g.gain.exponentialRampToValueAtTime(.0001,t+dur); o.connect(g); g.connect(dest||mus); o.start(t); o.stop(t+dur+.05); return o; }
+  function pluck(t,f,vol=.15){ const o=ctx.createOscillator(); o.type='sawtooth'; o.frequency.value=f; const fl=ctx.createBiquadFilter(); fl.type='lowpass'; fl.frequency.setValueAtTime(3000,t); fl.frequency.exponentialRampToValueAtTime(380,t+.35); const g=ctx.createGain(); g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+.004); g.gain.exponentialRampToValueAtTime(.0001,t+.85); o.connect(fl); fl.connect(g); g.connect(mus); o.start(t); o.stop(t+.9); }
+  function noise(t,dur,vol,freq=1500,q=1,dest){ const len=Math.max(1,Math.ceil(ctx.sampleRate*dur)); const b=ctx.createBuffer(1,len,ctx.sampleRate); const d=b.getChannelData(0); for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*(1-i/len); const s=ctx.createBufferSource(); s.buffer=b; const f=ctx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=freq; f.Q.value=q; const g=ctx.createGain(); g.gain.value=vol; s.connect(f); f.connect(g); g.connect(dest||sfx); s.start(t); }
+  function kick(t,vol=.5){ const o=ctx.createOscillator(),g=ctx.createGain(); o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(42,t+.22); g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+.3); o.connect(g); g.connect(mus); o.start(t); o.stop(t+.32); }
+  const TAV = [[50,57,62,65,69,65,62,57],[48,55,60,64,67,64,60,55],[46,53,58,62,65,62,58,53],[45,52,57,61,64,61,57,52]];
+  const THINK = [38,38,45,38,41,38,44,43];
+  const BATTLE = [[38,50,38,50,41,53,40,52],[36,48,36,48,38,50,40,52]];
+  function schedule(){
+    if (!ctx) return; const now = ctx.currentTime;
+    if (nextT < now) nextT = now + .02;
+    while (nextT < now + .3) {
+      const t = nextT;
+      if (mode === 'tavern') {
+        const bar = Math.floor(step/8)%4, n = step%8, ns = TAV[bar];
+        pluck(t, hz(ns[n]), n===0 ? .17 : .1);
+        if (n===0) tone(t, hz(ns[0]-12), 2.4, 'triangle', .08);
+        if (n%2===0) noise(t,.04,.035,7000,.8,mus);
+        if (n===5 && Math.random()<.35) tone(t, hz(ns[0]+24+pick([0,3,7,10])), .7, 'sine', .045);
+        nextT += 60/100/2;
+      } else if (mode === 'think') {
+        const n = step%8;
+        tone(t, hz(THINK[n]), .2, 'square', .045);
+        if (n%2===0) kick(t,.45);
+        if (n===0) tone(t, hz(THINK[0]+24+(Math.floor(step/8)%2?3:0)), 1.3, 'sawtooth', .025, mus, .3);
+        noise(t,.03,.03,9000,1,mus);
+        nextT += 60/118/2;
+      } else if (mode === 'battle') {
+        const bar = Math.floor(step/8)%2, n = step%8;
+        tone(t, hz(BATTLE[bar][n]), .14, 'square', .05);
+        if (n%4===0) kick(t,.6); if (n%4===2) noise(t,.12,.18,1800,.7,mus);
+        if (n===0) tone(t, hz(BATTLE[bar][0]+24), .9, 'sawtooth', .03, mus, .02);
+        nextT += 60/150/2;
+      } else { nextT = now + .3; return; }
+      step++;
+    }
+  }
+  function music(m){ init(); if (!ctx || m === mode) return; mode = m; step = 0; nextT = ctx.currentTime + .05; if (!timer) timer = setInterval(schedule, 70); }
+  function fx(name){
+    init(); if (!ctx) return; const t = ctx.currentTime + .01;
+    if (name==='dice'){ for(let i=0;i<9;i++) noise(t+i*.07+Math.random()*.03,.03,.5,2500+rnd(2500),3); }
+    else if (name==='ding'){ tone(t,hz(84),.5,'sine',.25,sfx); tone(t+.06,hz(91),.6,'sine',.18,sfx); }
+    else if (name==='pop'){ tone(t,hz(72),.15,'square',.12,sfx); tone(t+.05,hz(79),.2,'square',.1,sfx); }
+    else if (name==='good'){ [62,66,69,74].forEach((m,i)=>tone(t+i*.08,hz(m),.5,'square',.08,sfx)); }
+    else if (name==='bad'){ [58,55,51].forEach((m,i)=>tone(t+i*.16,hz(m),.4,'sawtooth',.08,sfx)); }
+    else if (name==='crit'){ [62,66,69,74,78,81,86].forEach((m,i)=>tone(t+i*.07,hz(m),.7,'square',.08,sfx)); tone(t+.5,hz(50),1.6,'sawtooth',.08,sfx,.05); }
+    else if (name==='fumble'){ const o=tone(t,hz(55),1.6,'sawtooth',.12,sfx); o.frequency.setValueAtTime(hz(55),t); [0,.35,.7].forEach((d,i)=>{o.frequency.linearRampToValueAtTime(hz(55-i),t+d+.05);o.frequency.linearRampToValueAtTime(hz(54-i),t+d+.3);}); o.frequency.linearRampToValueAtTime(hz(46),t+1.5); }
+    else if (name==='gong'){ tone(t,hz(40),3,'sine',.4,sfx,.01); tone(t,hz(52.3),2.5,'triangle',.15,sfx,.01); noise(t,.6,.15,300,.5); }
+  }
+  function toggle(){ init(); muted = !muted; store.set('rfs-mute', muted); if (master) master.gain.value = muted ? 0 : .75; return muted; }
+  return { init, music, fx, toggle, get muted(){ return muted; } };
+})();
+
+/* ---------------- NETWORK (WebSocket room relay + AI DM endpoint) ---------------- */
+let NR = null, SERVER = {password:false};
+const capsReady = fetch('/api/health').then(r => r.json()).then(j => { SERVER = j; }).catch(() => {});
+const Net = {
+  // Join a room by code. Resolves an object with presence(), onPeers(), leave(), connected().
+  join(code, hostKey){
+    return new Promise((resolve, reject) => {
+      let ws, mine = {}, handlers = [], errHandlers = [], open = false, closed = false, first = true, retry = 0, connTimer;
+      const conn = $('#conn');
+      const api = {
+        presence(patch){ for (const [k,v] of Object.entries(patch)) { if (v === null) delete mine[k]; else mine[k] = v; } if (open) ws.send(JSON.stringify({t:'presence', patch})); return Promise.resolve(); },
+        onPeers(fn, onErr){ handlers.push(fn); if (onErr) errHandlers.push(onErr); return () => { handlers = handlers.filter(h => h !== fn); }; },
+        leave(){ closed = true; try { ws.close(); } catch {} return Promise.resolve(); },
+        connected: () => open
+      };
+      function connect(){
+        const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+        ws = new WebSocket(`${proto}//${location.host}/ws`);
+        ws.onopen = () => ws.send(JSON.stringify({t:'join', code, hostKey, presence: mine}));
+        ws.onmessage = ev => {
+          let m; try { m = JSON.parse(ev.data); } catch { return; }
+          if (m.t === 'joined') { open = true; retry = 0; clearTimeout(connTimer); conn.hidden = true; if (first) { first = false; resolve(api); } }
+          else if (m.t === 'peers') handlers.forEach(h => h({peers: m.peers}));
+          else if (m.t === 'error') { if (first) { first = false; closed = true; ws.close(); reject({code: m.error}); } else { closed = true; errHandlers.forEach(h => h({code:m.error})); } }
+        };
+        ws.onclose = () => {
+          open = false; if (closed) return;
+          connTimer = setTimeout(() => { conn.hidden = false; }, 1500);
+          setTimeout(connect, Math.min(8000, 500 * 2 ** retry++));
+        };
+      }
+      // resend presence when a phone wakes up
+      document.addEventListener('visibilitychange', () => { if (!document.hidden && !open && !closed && ws?.readyState > 1) connect(); });
+      connect();
+      setTimeout(() => { if (first) { first = false; reject({code:'timeout'}); } }, 15000);
+    });
+  }
+};
+async function postJSON(url, body){
+  const r = await fetch(url, {method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify(body)});
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw {code: j.error || 'upstream_error', status: r.status};
+  return j;
+}
+
+function joinURL(){ return location.origin + '/' + (window.__code || ''); }
+function qrSVG(text){
+  try {
+    const q = qrcode(0, 'M'); q.addData(text); q.make();
+    const n = q.getModuleCount(); let d = '';
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) d += `M${c} ${r}h1v1h-1z`;
+    return `<svg viewBox="-2 -2 ${n+4} ${n+4}" shape-rendering="crispEdges"><rect x="-2" y="-2" width="${n+4}" height="${n+4}" fill="#fff"/><path d="${d}" fill="#1a0f24"/></svg>`;
+  } catch { return ''; }
+}
+/* ---------------- SHARED RENDER BITS ---------------- */
+function d20svg(){
+  return `<svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="dg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7ff3ff"/><stop offset=".35" stop-color="#c9a7ff"/><stop offset=".65" stop-color="#ff9ad5"/><stop offset="1" stop-color="#ffe58a"/></linearGradient></defs>
+  <polygon points="50,3 93,27 93,73 50,97 7,73 7,27" fill="url(#dg)" stroke="#1a0f24" stroke-width="2.5"/>
+  <polygon points="50,22 78,66 22,66" fill="#ffffff55" stroke="#1a0f24" stroke-width="2"/>
+  <path d="M50 3 L50 22 M93 27 L78 66 M7 27 L22 66 M50 97 L22 66 M50 97 L78 66 M93 73 L78 66 M7 73 L22 66 M7 27 L50 22 L93 27" stroke="#1a0f24" stroke-width="2" fill="none"/></svg>`;
+}
+function resultText(res){ return {crit:'NATURAL 20!', success:'Success', fail:'Failure', fumble:'NATURAL 1'}[res] || ''; }
+function paras(arr){ return (arr||[]).map(p=>`<p>${esc(p)}</p>`).join(''); }
+function ckText(o){ if(!o) return ''; const ab = SKILLS[o.sk] || o.sk; return `${esc(ab)} (${esc(o.sk)}) DC ${o.dc}`; }
+
+/* =========================================================
+   TITLE SCREEN
+   ========================================================= */
+function titleScreen(){
+  const saved = store.get('rfs-host');
+  const resumable = saved && saved.S && saved.S.ph !== 'end' && Date.now() - (saved.ts||0) < 8*3600e3;
+  const pl = store.get('rfs-player') || {};
+  const linkCode = (location.pathname.match(/^\/([A-Za-z]{4})$/) || [])[1];
+  if (linkCode) pl.code = linkCode.toUpperCase();
+  $('#app').innerHTML = `
+  <div class="title-screen">
+    <div class="label sparkle">a party game for degenerate adventurers</div>
+    <h1 class="logo chrome">Dummies & Dragons</h1>
+    <div class="tagline">1&ndash;6 players &middot; phones &middot; an AI dungeon master with no filter</div>
+    <div class="mode-grid">
+      <div class="panel">
+        <h2 class="holo-text">Host the table</h2>
+        <p class="muted" style="margin:0">Put this screen on the TV or a laptop everyone can see. It runs the story, the music and the dice.</p>
+        <div id="pwWrap" hidden class="stack" style="gap:6px"><label class="label" for="hpw">Host password</label><input id="hpw" type="password" autocomplete="current-password" value="${esc(store.get('rfs-pw')||'')}"></div>
+        <div class="row"><button class="btn" id="hostBtn">Open a table</button>${resumable ? `<button class="btn ghost small" id="resumeBtn">Resume ${esc(saved.code)}</button>` : ''}</div>
+      </div>
+      <div class="panel">
+        <h2 class="holo-text">Join on a phone</h2>
+        <label class="label" for="jcode">Room code</label>
+        <input id="jcode" maxlength="4" autocomplete="off" autocapitalize="characters" placeholder="ABCD" value="${esc(pl.code||'')}" style="font-family:var(--f-mono);font-size:1.8rem;letter-spacing:.3em;text-transform:uppercase">
+        <label class="label" for="jname">Your name</label>
+        <input id="jname" maxlength="16" placeholder="Lizzy" value="${esc(pl.nm||'')}">
+        <button class="btn" id="joinBtn">Join</button>
+      </div>
+    </div>
+    <p class="muted" id="capnote" style="max-width:60ch"></p>
+  </div>`;
+  $('#hostBtn').onclick = () => { Sound.init(); Host.start(null); };
+  if (resumable) $('#resumeBtn').onclick = () => { Sound.init(); Host.start(saved); };
+  $('#joinBtn').onclick = () => {
+    const code = $('#jcode').value.trim().toUpperCase(), nm = clip($('#jname').value, 16);
+    if (!/^[A-Z]{4}$/.test(code)) return toast('Enter the 4-letter code from the TV');
+    if (!nm) return toast('Pick a name');
+    Sound.init(); Phone.start(code, nm);
+  };
+  capsReady.then(() => { if (SERVER.password) $('#pwWrap').hidden = false; });
+  if (linkCode) setTimeout(() => $('#jname').focus(), 50);
+}
+
+/* =========================================================
+   HOST (the TV) — owns the game state and calls the AI DM
+   ========================================================= */
+const Host = (() => {
+  let S, G, code, lastPid = -1, busy = false, retryFn = null, typeTimer = null, thinkTimer = null, lastSeen = {};
+
+  function fresh(){
+    return { v:1, code, ph:'lobby', pid:0, end:0, seats:[], party:{}, ttl:'', scene:0, n:LENGTHS.standard.n,
+      nar:[], q:'', opts:[], vc:[], win:-1, roller:'', ck:null, roll:null, foe:null, fw:[], ml:{}, sub:[], intros:[], awards:[], clash:[], msg:'', err:'' };
+  }
+  function freshG(){ return { players:{}, bank:[], log:[], fwId:null, len:'standard', brain:'clever', stats:{}, round:0, fightKind:null, combatTurns:[] }; }
+
+  let hostKey = '';
+  async function start(saved){
+    const password = $('#hpw')?.value || '';
+    $('#app').innerHTML = `<div class="think"><div class="orb"></div><div class="line">Setting up the table</div></div>`;
+    const fail = (title, msg) => { $('#app').innerHTML = `<div class="title-screen"><h2 class="chrome" style="font-size:3rem">${esc(title)}</h2><p class="muted">${esc(msg)}</p><button class="btn" id="backBtn">Back</button></div>`; $('#backBtn').onclick = titleScreen; };
+    let room;
+    try { room = await postJSON('/api/room', {password, code: saved?.code, hostKey: saved?.hostKey}); }
+    catch (e) {
+      if (e.code === 'wrong_password') { store.del('rfs-pw'); return fail('Wrong password', 'Ask whoever set up the site for the host password.'); }
+      if (e.code === 'too_many_rooms') return fail('Slow down', 'This network has opened a lot of tables today. Try again tomorrow.');
+      return fail("Couldn't reach the server", 'Check your connection and try again. If the site was asleep, give it 30 seconds to wake up.');
+    }
+    if (password) store.set('rfs-pw', password);
+    code = room.code; hostKey = room.hostKey; window.__code = code;
+    S = saved?.S || fresh(); G = saved?.G || freshG(); S.code = code;
+    try { NR = await Net.join(code, hostKey); }
+    catch (e) { return fail("Couldn't open a table", 'Try again in a moment.'); }
+    NR.onPeers(onPeers);
+    if (busy === false && S.ph === 'think') { S.err = 'The game was interrupted mid-thought.'; retryFn = null; }
+    pub(); render(true);
+    setInterval(tick, 400);
+    Sound.music(S.ph==='combat'||S.ph==='clash' ? 'battle' : 'tavern');
+  }
+
+  /* ----- networking ----- */
+  function pub(){
+    let s = JSON.parse(JSON.stringify(S));
+    let bytes = new Blob([JSON.stringify(s)]).size;
+    while (bytes > 30000 && s.nar.length) { const last = s.nar[s.nar.length-1]; if (last.length > 200) s.nar[s.nar.length-1] = last.slice(0, last.length-200)+'…'; else s.nar.pop(); bytes = new Blob([JSON.stringify(s)]).size; }
+    NR?.presence({h:1, s}).catch(()=>{});
+    store.set('rfs-host', {code, hostKey, S, G, ts:Date.now()});
+  }
+  function onPeers({peers}){
+    let changed = false;
+    for (const p of peers){
+      const pr = p.presence || {};
+      if (!pr.p || typeof pr.id !== 'string' || !/^p[a-z0-9]{4,12}$/.test(pr.id)) continue;
+      const prev = G.players[pr.id];
+      const nm = clip(pr.nm, 16) || 'Someone';
+      const ch = pr.ch && CLASSES[pr.ch.cl] && RACES[pr.ch.rc] ? {nm:clip(pr.ch.nm,28)||nm, rc:pr.ch.rc, cl:pr.ch.cl, lk:clip(pr.ch.lk,200)} : (prev?.ch || null);
+      G.players[pr.id] = {nm, ch, ml: Array.isArray(pr.ml) ? pr.ml.slice(0,3).map(a=>clip(a,60)) : (prev?.ml||[]), inp: pr.inp && typeof pr.inp === 'object' ? pr.inp : null};
+      if (!prev) changed = true;
+      lastSeen[pr.id] = Date.now();
+      if (S.ph === 'lobby' && !S.seats.find(s=>s.id===pr.id) && S.seats.length < 6){ S.seats.push({id:pr.id, n:nm}); Sound.fx('pop'); changed = true; }
+      const seat = S.seats.find(s=>s.id===pr.id); if (seat && seat.n !== nm){ seat.n = nm; changed = true; }
+    }
+    // remove lobby seats for people who left before the game started
+    if (S.ph === 'lobby') {
+      const here = new Set(peers.map(p=>p.presence?.id).filter(Boolean));
+      const before = S.seats.length; S.seats = S.seats.filter(s=>here.has(s.id)); if (S.seats.length !== before) changed = true;
+    }
+    updateSubs();
+    if (changed) pub();
+    render(false);
+    checkAllIn();
+  }
+
+  /* ----- phase helpers ----- */
+  function seated(){ return S.seats; }
+  function P(id){ return G.players[id] || {}; }
+  function cname(id){ return P(id).ch?.nm || S.seats.find(s=>s.id===id)?.n || 'Someone'; }
+  function inp(id, k){ const i = P(id).inp; return i && i.pid === S.pid && i.k === k ? i : null; }
+  function setPhase(ph, secs = 0, extra = {}){
+    S.ph = ph; S.pid++; S.end = secs ? Date.now() + secs*1000 : 0; S.sub = []; S.err = ''; Object.assign(S, extra);
+    pub(); render(true);
+  }
+  function standing(){ return S.seats.filter(s => !S.party[s.id]?.dn); }
+  function needIds(){
+    switch (S.ph){
+      case 'madlibs': case 'chargen': case 'framework': case 'pitch': case 'vote': return S.seats.map(s=>s.id);
+      case 'roll': return [S.roller];
+      case 'combat': return S.seats.map(s=>s.id);
+      default: return [];
+    }
+  }
+  const KEY = {madlibs:'ml', chargen:'ch', framework:'fw', pitch:'pitch', vote:'vote', roll:'roll', combat:'cbt'};
+  function updateSubs(){
+    const k = KEY[S.ph]; if (!k) return;
+    const sub = needIds().filter(id => inp(id, k));
+    if (sub.join() !== S.sub.join()) { S.sub = sub; pub(); }
+  }
+  let allInTimer = null;
+  function checkAllIn(){
+    const need = needIds(); if (!need.length || busy) return;
+    if (need.every(id => S.sub.includes(id))) {
+      if (!allInTimer) allInTimer = setTimeout(() => { allInTimer = null; const n2 = needIds(); if (n2.length && n2.every(id=>S.sub.includes(id))) advance(); }, 1200);
+    }
+  }
+  function tick(){
+    const t = $('#timer');
+    if (S.end) {
+      const left = Math.max(0, Math.ceil((S.end - Date.now())/1000));
+      if (t) { t.textContent = left; t.classList.toggle('hot', left <= 10); }
+      if (left <= 0 && !busy) { S.end = 0; advance(); }
+    } else if (t) t.textContent = '';
+  }
+
+  /* ----- the game flow ----- */
+  async function advance(){
+    if (busy) return;
+    const ph = S.ph;
+    if (ph === 'lobby') return startGame();
+    if (ph === 'madlibs') return endMadlibs();
+    if (ph === 'reveal') return setPhase('chargen', 0);
+    if (ph === 'chargen') return endChargen();
+    if (ph === 'framework') return endFramework();
+    if (ph === 'party') return setPhase('pitch', 90);
+    if (ph === 'pitch') return endPitch();
+    if (ph === 'vote') return endVote();
+    if (ph === 'roll') return endRoll();
+    if (ph === 'combat') return endCombat();
+  }
+
+  function startGame(){
+    if (!S.seats.length) return toast('Nobody has joined yet');
+    S.n = LENGTHS[G.len].n;
+    S.seats.forEach((s,i) => { G.stats[s.id] = G.stats[s.id] || {n20:0,n1:0,wins:0}; });
+    const pool = shuffle(PROMPTS.map((_,i)=>i)); S.ml = {};
+    S.seats.forEach((s,i) => S.ml[s.id] = pool.slice(i*3, i*3+3));
+    Sound.fx('gong');
+    setPhase('madlibs', 120);
+  }
+  function endMadlibs(){
+    G.bank = [];
+    S.seats.forEach(s => { const pl = P(s.id); (S.ml[s.id]||[]).forEach((pi, j) => { const a = clip(pl.ml?.[j], 60); if (a) G.bank.push({q:PROMPTS[pi], a, by:s.n}); }); });
+    if (!G.bank.length) G.bank = [{q:'A horrible name for a tavern', a:'The Soggy Flagon', by:'the DM'}, {q:'The sexiest masculine name', a:'Brock Thunderloins', by:'the DM'}];
+    setPhase('reveal', Math.min(30, 6 + G.bank.length*1.2));
+  }
+  function endChargen(){
+    // anyone without a locked character gets a random one
+    S.seats.forEach(s => { const pl = G.players[s.id] || (G.players[s.id] = {nm:s.n}); if (!pl.ch) pl.ch = randomChar(s.n); const sh = sheet(pl.ch); S.party[s.id] = {hp:sh.hp, mx:sh.hp, insp:0, dn:0}; });
+    S.fw = shuffle(FRAMEWORKS).slice(0,3).map(f => f.id);
+    setPhase('framework', 40);
+  }
+  function endFramework(){
+    const counts = {}; S.fw.forEach(id => counts[id] = 0);
+    S.seats.forEach(s => { const i = inp(s.id,'fw'); if (i && counts[i.v] !== undefined) counts[i.v]++; });
+    const max = Math.max(...Object.values(counts)); G.fwId = pick(S.fw.filter(id => counts[id] === max));
+    S.scene = 1;
+    runAI('Writing the opening scene', aiIntro);
+  }
+  function endPitch(){ runAI('Reading your terrible ideas', aiOptions); }
+  function endVote(){
+    const vc = S.opts.map(() => 0); S.seats.forEach(s => { const i = inp(s.id,'vote'); if (i && Number.isInteger(i.v) && i.v >= 0 && i.v < vc.length) vc[i.v]++; });
+    const max = Math.max(...vc); const win = pick(vc.map((c,i)=>c===max?i:-1).filter(i=>i>=0));
+    const o = S.opts[win]; let roller = o.by && S.seats.find(s=>s.id===o.by) && !S.party[o.by]?.dn ? o.by : null;
+    if (!roller) { const st = standing(); roller = (st.length ? pick(st) : pick(S.seats)).id; }
+    G.stats[roller] && o.by === roller && G.stats[roller].wins++;
+    Sound.fx('ding');
+    setPhase('roll', 45, {vc, win, roller, ck:{sk:o.sk, dc:o.dc}, roll:null});
+  }
+  function endRoll(){
+    const id = S.roller, i = inp(id,'roll'), ch = P(id).ch || randomChar('x');
+    let dice = i && Array.isArray(i.d) ? i.d.map(n=>clamp(parseInt(n)||1,1,20)).slice(0,2) : [die(20)];
+    let adv = false;
+    if (dice.length === 2 && S.party[id]?.insp > 0) { adv = true; S.party[id].insp--; } else dice = [dice[0]];
+    const d = Math.max(...dice), m = checkMod(ch, S.ck.sk), tot = d + m;
+    const res = d === 20 ? 'crit' : d === 1 ? 'fumble' : tot >= S.ck.dc ? 'success' : 'fail';
+    if (d===20) G.stats[id] && G.stats[id].n20++; if (d===1) G.stats[id] && G.stats[id].n1++;
+    S.roll = {id, dice, adv, d, m, tot, res, auto: !i};
+    setPhase('rolled', 0); Sound.fx('dice');
+    setTimeout(() => Sound.fx(res==='crit'?'crit':res==='fumble'?'fumble':res==='success'?'good':'bad'), 1500);
+    setTimeout(() => runAI('Deciding your fate', aiResolve), 4200);
+  }
+  function endCombat(){
+    const foe = S.foe, turns = [];
+    S.seats.forEach(s => {
+      const pt = S.party[s.id], ch = P(s.id).ch || randomChar('x'), i = inp(s.id,'cbt');
+      if (pt.dn) {
+        const d = i && Array.isArray(i.d) ? clamp(parseInt(i.d[0])||1,1,20) : die(20);
+        const up = d >= 10; if (up) { pt.dn = 0; pt.hp = d === 20 ? 5 : 1; }
+        turns.push({id:s.id, save:true, d, up});
+        return;
+      }
+      if (!i) { turns.push({id:s.id, idle:true}); return; }
+      let dice = Array.isArray(i.d) ? i.d.map(n=>clamp(parseInt(n)||1,1,20)).slice(0,2) : [die(20)];
+      let adv = false; if (dice.length===2 && pt.insp>0){ adv = true; pt.insp--; } else dice = [dice[0]];
+      const d = Math.max(...dice), m = atkMod(ch), tot = d + m, crit = d === 20;
+      const hit = crit || (d !== 1 && tot >= foe.ac);
+      let dmg = 0; if (hit) { const c = CLASSES[ch.cl]; c.dmg.forEach(f => { dmg += die(f); if (crit) dmg += die(f); }); dmg += Math.max(0, amod(sheet(ch).st[c.atk])); }
+      if (d===20) G.stats[s.id].n20++; if (d===1) G.stats[s.id].n1++;
+      turns.push({id:s.id, t:clip(i.t,140)||'attacks', d, m, tot, hit, crit, dmg, adv});
+    });
+    const before = foe.hp; foe.hp = Math.max(0, foe.hp - turns.reduce((a,t)=>a+(t.dmg||0),0));
+    G.round++; G.combatTurns = turns; G.foeBefore = before;
+    S.clash = turns.map(t => ({id:t.id, d:t.d||0, tot:t.tot||0, hit:t.hit?1:0, crit:t.crit?1:0, dmg:t.dmg||0, save:t.save?1:0, up:t.up?1:0, idle:t.idle?1:0}));
+    setPhase('clash', 0); Sound.fx('dice');
+    setTimeout(() => Sound.fx(turns.some(t=>t.crit)?'crit':turns.some(t=>t.hit)?'good':'bad'), 1200);
+    setTimeout(() => runAI(foe.hp <= 0 ? 'Writing a death scene' : 'The enemy strikes back', aiCombat), 4500);
+  }
+
+  /* ----- AI DM ----- */
+  function fw(){ return FRAMEWORKS.find(f => f.id === G.fwId) || FRAMEWORKS[0]; }
+  function act(){ return S.scene <= Math.ceil(S.n/3) ? 1 : S.scene <= Math.ceil(2*S.n/3) ? 2 : 3; }
+  const RULES = `You are the Dungeon Master and every NPC for DUMMIES & DRAGONS, a Jackbox-style party game: a comedy D&D 5e one-shot played by up to 6 friends on their phones. Your narration is shown on a TV and read aloud.
+Tone: crude, profane, absurd, R-rated comedy. Swearing, gross-out humor, innuendo and roasting the player characters are all welcome. No explicit sex, no slurs, nothing about real people.
+Style: punchy and fast. Short paragraphs, vivid specifics, NPCs with funny voices quoted in dialogue. Address the party as "you" and use character names. Never decide what a player character says or does beyond the action they chose.
+Rules: real D&D 5e logic. Ability checks use the 18 5e skills. DCs: easy 10, medium 13, hard 16, very hard 19. A natural 20 is a legendary success; a natural 1 is a humiliating disaster.
+Reply with ONLY the JSON object requested.`;
+  function context(){
+    const f = fw();
+    const party = S.seats.map(s => { const c = P(s.id).ch; const st = S.party[s.id] || {}; if (!c) return `- id ${s.id}: player ${s.n}`; return `- id ${s.id}: "${c.nm}" (played by ${s.n}), ${c.rc} ${c.cl}, level 3, HP ${st.hp}/${st.mx}${st.dn?' (DOWNED)':''}. Signature moves: ${CLASSES[c.cl].moves.join(', ')}. Looks: ${c.lk || 'not described'}.`; }).join('\n');
+    const bank = G.bank.map(b => `- "${b.a}" (answer to "${b.q}", from ${b.by})`).join('\n');
+    return `${RULES}
+
+ADVENTURE: ${f.name}. ${f.pitch}
+ACT 1: ${f.acts[0]}. ACT 2: ${f.acts[1]}. ACT 3: ${f.acts[2]}. FINAL BOSS: ${f.boss}.
+NOW: act ${act()} of 3, scene ${S.scene} of ${S.n}. Keep the pacing on track for that.
+
+WORD BANK. The players' own madlib answers. Use them verbatim as names of NPCs, places, items, foods, curses and catchphrases. Weave 1-3 into each narration, favor ones not used yet, and make them land as jokes:
+${bank}
+
+PARTY:
+${party}
+
+STORY SO FAR:
+${G.log.length ? G.log.map((l,i)=>`${i+1}. ${l}`).join('\n') : '(just starting)'}`;
+  }
+  function narArr(t){ return String(t||'').split(/\n\s*\n|\n/).map(p=>clip(p,700)).filter(Boolean).slice(0,5); }
+  function applyHp(list){
+    if (!Array.isArray(list)) return;
+    list.forEach(h => { const pt = S.party[h?.id]; if (!pt) return; const c = clamp(parseInt(h.change)||0, -12, 10); pt.hp = clamp(pt.hp + c, 0, pt.mx); if (pt.hp <= 0) { pt.hp = 0; pt.dn = 1; } else if (c > 0) pt.dn = 0; });
+  }
+  async function ask(prompt, quick){
+    const j = await postJSON('/api/dm', {code, hostKey, prompt, fast: !!(quick || G.brain === 'fast')});
+    if (!j.data || typeof j.data !== 'object') throw {code:'invalid_json'};
+    return j.data;
+  }
+  async function runAI(msg, fn){
+    if (busy) return;
+    G.pending = {aiIntro:'intro', aiOptions:'options', aiResolve:'resolve', aiCombat:'combat'}[fn.name] || 'resolve';
+    busy = true; retryFn = () => runAI(msg, fn);
+    setPhase('think', 0, {msg}); Sound.music('think');
+    try {
+      await fn();
+      busy = false;
+    } catch (e) {
+      busy = false; console.warn(e);
+      const why = {
+        rate_limited:'The DM is getting too many requests. Wait a minute, then retry.',
+        overloaded:'The AI is overloaded right now. Wait a few seconds, then retry.',
+        invalid_json:'The DM mumbled. Retry.',
+        room_limit:'This table has used up its DM calls for the night. Start a new game, or skip ahead without the DM.',
+        bad_key:'The site’s Anthropic API key is wrong or missing. Whoever set up the site needs to fix it.',
+        no_credit:'The site’s Anthropic account is out of credit. Add credit in the Anthropic Console, then retry.',
+        not_host:'This screen lost its host pass (the server may have restarted). Open a new table.'
+      }[e?.code] || 'The DM tripped over the table. Retry.';
+      S.err = why; pub(); render(true);
+    }
+  }
+  async function aiIntro(){
+    const r = await ask(`${context()}
+
+TASK: Open the adventure.
+- "title": a funny title for tonight's adventure, max 6 words; use a word-bank answer if it fits.
+- "intros": one per party member: {"id": their id, "line": a one-sentence roast-style introduction as the camera pans to them, max 30 words, based on race, class and looks}.
+- "narration": the opening scene, 120-170 words, 2-3 paragraphs separated by blank lines. Set up Act 1 and the hook. Use at least two word-bank answers.
+- "question": what you ask the party next, max 16 words, ending with "?".
+- "recap": what happened, max 25 words.
+JSON: {"title":"","intros":[{"id":"","line":""}],"narration":"","question":"","recap":""}`);
+    S.ttl = clip(r.title, 60) || fw().name;
+    S.intros = (Array.isArray(r.intros) ? r.intros : []).filter(x => S.party[x?.id]).map(x => ({id:x.id, l:clip(x.line, 220)}));
+    S.nar = narArr(r.narration); S.q = clip(r.question, 140) || 'What do you do?';
+    G.log.push(clip(r.recap, 200));
+    Sound.music('tavern'); Sound.fx('gong');
+    setPhase('party', 8 + S.intros.length*6);
+  }
+  async function aiOptions(){
+    const pitches = S.seats.map(s => ({id:s.id, t:clip(inp(s.id,'pitch')?.v, 200)})).filter(p => p.t);
+    const k = Math.min(pitches.length, 3);
+    const r = await ask(`${context()}
+
+THE SCENE: ${S.nar.join(' ')}
+QUESTION TO THE PARTY: ${S.q}
+
+THE PLAYERS' PITCHES:
+${pitches.length ? pitches.map(p=>`- from id ${p.id} (${cname(p.id)}): ${p.t}`).join('\n') : '(nobody pitched anything, cowards)'}
+
+TASK: Turn ${k ? `the pitches into ${k} options` : 'nothing into 3 options of your own'} for the party to vote on${k ? ', plus 1 extra WILDCARD option of your own (by: null) that is chaotic and tempting' : ''}. Keep each pitch's idea and its funniest detail and punch it up: max 22 words, phrased as an action. Merge near-duplicates and credit the first pitcher. Pick the single 5e skill each attempt uses and a fair DC.
+JSON: {"options":[{"text":"","by":"player id or null","skill":"one of: ${Object.keys(SKILLS).join(', ')}","dc":13}]}`, true);
+    let opts = (Array.isArray(r.options) ? r.options : []).slice(0,4).map(o => ({t:clip(o?.text,170), by: S.party[o?.by] ? o.by : null, sk: SKILLS[o?.skill] ? o.skill : 'Athletics', dc: clamp(parseInt(o?.dc)||13, 5, 25)})).filter(o=>o.t);
+    if (!opts.length) opts = pitches.slice(0,3).map(p => ({t:p.t, by:p.id, sk:'Athletics', dc:13}));
+    if (!opts.length) opts = [{t:'Start a bar fight for no reason', by:null, sk:'Athletics', dc:12}, {t:'Lie to the nearest authority figure', by:null, sk:'Deception', dc:13}];
+    S.opts = opts; S.vc = []; S.win = -1;
+    Sound.music('tavern'); Sound.fx('ding');
+    setPhase('vote', 40);
+  }
+  async function aiResolve(){
+    const o = S.opts[S.win], rl = S.roll, ch = P(rl.id).ch;
+    const mid = Math.max(2, Math.round(S.n/2)), next = S.scene + 1;
+    let kind = 'scene';
+    if (next === mid) kind = 'fight'; else if (S.scene >= S.n) kind = 'boss';
+    const f = fw();
+    const nextInstr = kind === 'scene'
+      ? `then move the story forward into a new situation (act ${next <= Math.ceil(S.n/3) ? 1 : next <= Math.ceil(2*S.n/3) ? 2 : 3}) and end with a new "question" for the party, max 16 words, ending with "?".`
+      : kind === 'fight'
+      ? `then a fight breaks out: introduce a ridiculous enemy that fits the story (name it from the word bank if one fits). Give "foe": {"name": max 5 words, "hp": a number from 24 to 36, "ac": 12 to 14}. "question": a battle prompt like "How do you open this fight?".`
+      : `then the final showdown begins: ${f.boss} appears in all its glory (rename it with a word-bank answer if one fits). Give "foe": {"name": max 5 words, "hp": a number from 45 to 62, "ac": 15}. "question": a battle prompt.`;
+    const r = await ask(`${context()}
+
+THE SCENE: ${S.nar.join(' ')}
+THE PARTY CHOSE: "${o.t}". Attempted by ${cname(rl.id)} (${ch?.rc} ${ch?.cl}).
+CHECK: ${o.sk} DC ${o.dc}. They rolled a natural ${rl.d}${rl.adv?' (with advantage)':''}, ${sgn(rl.m)} = ${rl.tot}. RESULT: ${resultText(rl.res).toUpperCase()}.
+
+TASK: Narrate the outcome, 100-160 words, 2-3 paragraphs separated by blank lines. Open with the roll's outcome and make it land; ${nextInstr}
+Also "hp": any hit point changes this caused, as [{"id":"","change":-3}] (damage -1 to -8, healing +1 to +8; usually none on a success). "inspiration": the id of at most one player whose idea or play was funniest, or null. "recap": max 25 words.
+JSON: {"narration":"","question":"","hp":[],"inspiration":null,"recap":""${kind!=='scene'?',"foe":{"name":"","hp":30,"ac":13}':''}}`);
+    S.nar = narArr(r.narration); S.q = clip(r.question, 140) || 'What now?';
+    applyHp(r.hp);
+    if (r.inspiration && S.party[r.inspiration]) S.party[r.inspiration].insp = Math.min(2, S.party[r.inspiration].insp + 1);
+    G.log.push(clip(r.recap, 200));
+    if (S.seats.every(s => S.party[s.id].dn)) return finale('tpk');
+    S.scene = next;
+    if (kind === 'scene') { Sound.music('tavern'); return setPhase('pitch', 90, {foe:null}); }
+    const fo = r.foe || {};
+    const boss = kind === 'boss';
+    const hp = clamp(parseInt(fo.hp) || (boss?52:28), boss?40:18, boss?70:40) + (boss ? (S.seats.length-2)*6 : (S.seats.length-2)*3);
+    S.foe = {n: clip(fo.name, 40) || (boss ? 'The Big Bad' : 'Angry Something'), hp: Math.max(12,hp), mx: Math.max(12,hp), ac: clamp(parseInt(fo.ac)||(boss?15:13), 10, 17), boss: boss?1:0};
+    G.round = 0; Sound.music('battle'); Sound.fx('gong');
+    setPhase('combat', 75);
+  }
+  async function aiCombat(){
+    const foe = S.foe, turns = G.combatTurns;
+    const lines = turns.map(t => {
+      const nm = cname(t.id), cl = P(t.id).ch?.cl;
+      if (t.save) return `- ${nm} is downed and rolls a death save: natural ${t.d}. ${t.up ? 'They get back up!' : 'Still down.'}`;
+      if (t.idle) return `- ${nm} (${cl}) froze up and did nothing.`;
+      return `- ${nm} (${cl}): "${t.t}" rolled natural ${t.d}, total ${t.tot} vs AC ${foe.ac}: ${t.hit ? `HIT for ${t.dmg} damage${t.crit?' (CRITICAL!)':''}` : t.d===1 ? 'FUMBLE' : 'MISS'}.`;
+    }).join('\n');
+    const dead = foe.hp <= 0, flee = !dead && !foe.boss && G.round >= 5;
+    const tpk = S.seats.every(s => S.party[s.id].dn);
+    let task, shape;
+    if (dead && foe.boss) {
+      task = `Narrate this final round with a spectacular, disgusting finishing blow from whoever hit last, then an epilogue: what becomes of everyone and each hero, 180-240 words total, 3-4 paragraphs separated by blank lines. Then "awards": one per party member [{"id":"","title": a funny award name, max 5 words, "why": max 18 words}].`;
+      shape = `{"narration":"","awards":[{"id":"","title":"","why":""}],"recap":""}`;
+    } else if (dead || flee) {
+      task = `Narrate this round, 110-160 words, 2-3 paragraphs separated by blank lines. ${dead ? 'Include a spectacular, disgusting finishing blow from whoever hit last.' : 'The foe, beaten and humiliated, flees or surrenders in a ridiculous way.'} Then move the story on to a new situation and end with a "question" for the party, max 16 words, ending with "?".`;
+      shape = `{"narration":"","question":"","hp":[],"recap":""}`;
+    } else {
+      task = `Narrate this round, 90-140 words, 2 paragraphs separated by blank lines. Then the foe strikes back at 1-2 standing party members, with a one-line taunt in dialogue. Return their damage in "hp" (from -2 to -${foe.boss?10:7} each). "question": a short prompt for the next round, max 12 words.`;
+      shape = `{"narration":"","hp":[{"id":"","change":-4}],"question":"","recap":""}`;
+    }
+    const r = await ask(`${context()}
+
+COMBAT ROUND ${G.round} vs ${foe.n} (AC ${foe.ac}). Foe HP went from ${G.foeBefore} to ${foe.hp} out of ${foe.mx}.
+WHAT HAPPENED. Already rolled; narrate exactly these results:
+${lines}
+
+TASK: ${task} "recap": max 25 words.
+JSON: ${shape}`);
+    S.nar = narArr(r.narration); G.log.push(clip(r.recap, 200));
+    if (dead && foe.boss) return finale('win', r);
+    applyHp(r.hp);
+    if (S.seats.every(s => S.party[s.id].dn)) return finale('tpk');
+    S.q = clip(r.question, 140) || 'What now?';
+    if (dead || flee) {
+      S.foe = null; S.scene++;
+      S.seats.forEach(s => { const pt = S.party[s.id]; if (pt.dn) { pt.dn = 0; pt.hp = 1; } });
+      Sound.music('tavern'); return setPhase('pitch', 90);
+    }
+    Sound.music('battle');
+    setPhase('combat', 75);
+  }
+  async function finale(kind, r){
+    if (kind === 'tpk') {
+      G.pending = 'tpk';
+      r = await ask(`${context()}
+
+THE WHOLE PARTY IS DOWN. Narrate their glorious, deeply embarrassing defeat and an epilogue of how the world goes on without them, 160-220 words, 3 paragraphs separated by blank lines. Then "awards": one per party member [{"id":"","title": funny award name max 5 words,"why": max 18 words}].
+JSON: {"narration":"","awards":[{"id":"","title":"","why":""}]}`);
+      S.nar = narArr(r.narration);
+    }
+    S.awards = (Array.isArray(r?.awards) ? r.awards : []).filter(a => S.party[a?.id]).map(a => ({id:a.id, t:clip(a.title,50), w:clip(a.why,140)}));
+    S.outcome = kind; S.foe = null;
+    Sound.music('tavern'); Sound.fx(kind === 'win' ? 'crit' : 'fumble');
+    setPhase('end', 0);
+  }
+  function fallback(){
+    // keep the game moving without the AI
+    retryFn = null; S.err = ''; Sound.music('tavern');
+    const k = G.pending;
+    const endWin = () => { S.awards = []; S.outcome = 'win'; S.foe = null; return setPhase('end', 0); };
+    if (k === 'intro' || !S.ttl) { S.ttl = fw().name; S.nar = [fw().pitch]; S.q = 'What do you do first?'; return setPhase('pitch', 90); }
+    if (k === 'options') {
+      const pitches = S.seats.map(s => ({id:s.id, t:clip(inp(s.id,'pitch')?.v || (P(s.id).inp?.k==='pitch' ? P(s.id).inp.v : ''), 170)})).filter(p=>p.t);
+      S.opts = pitches.length ? pitches.slice(0,4).map(p=>({t:p.t, by:p.id, sk:pick(['Athletics','Deception','Persuasion','Stealth','Acrobatics']), dc:13})) : [{t:'Start a bar fight for no reason', by:null, sk:'Athletics', dc:12}, {t:'Lie to the nearest authority figure', by:null, sk:'Deception', dc:13}];
+      return setPhase('vote', 40);
+    }
+    if (k === 'combat') {
+      if (S.foe && S.foe.hp <= 0 && S.foe.boss) { S.nar = ['The boss collapses in a heap of its own fluids. You win. Somehow.']; return endWin(); }
+      if (S.foe && S.foe.hp > 0 && G.round < 5) { S.nar = ['Steel clangs, someone screams, the fight drags on.']; S.q = 'Hit it again?'; return setPhase('combat', 75); }
+      S.foe = null; S.scene++; S.nar = ['The fight is over. Everyone pretends that went to plan.']; S.q = 'What now?'; return setPhase('pitch', 90);
+    }
+    if (k === 'tpk') { S.nar = ['Everyone is dead. The bards will sing of this, mockingly.']; S.awards = []; S.outcome = 'tpk'; return setPhase('end', 0); }
+    // resolve (or anything else)
+    if (S.scene >= S.n) { S.nar = ['Against all odds and good taste, you win.']; return endWin(); }
+    const o = S.opts[S.win];
+    S.nar = [S.roll && o ? `${resultText(S.roll.res)}! ${cname(S.roll.id)} tries to ${o.t.charAt(0).toLowerCase()+o.t.slice(1)}, and it goes ${S.roll.res==='success'||S.roll.res==='crit'?'shockingly well':'about as badly as you would expect'}.` : 'Time skips forward awkwardly.'];
+    S.q = 'What now?'; S.scene++; S.foe = null; return setPhase('pitch', 90);
+  }
+
+  /* ----- character helpers ----- */
+  function randomChar(nm){ return {nm: pick(NAME_A)+' '+pick(NAME_B), rc: pick(Object.keys(RACES)), cl: pick(Object.keys(CLASSES)), lk: pick(LOOKS)}; }
+
+  /* ----- TV RENDER ----- */
+  function seatColor(id){ const i = S.seats.findIndex(s=>s.id===id); return SEAT_COLORS[(i<0?0:i)%6]; }
+  function partyRail(){
+    if (!['party','pitch','vote','roll','rolled','combat','clash','think','end'].includes(S.ph) || !Object.keys(S.party).length) return '';
+    return `<aside class="party" aria-label="Party">${S.seats.map(s => {
+      const c = P(s.id).ch, pt = S.party[s.id] || {hp:0,mx:1};
+      const w = Math.round(100*pt.hp/pt.mx);
+      return `<div class="pcard${pt.dn?' down':''}" style="--pc:${seatColor(s.id)}">
+        <div class="row" style="justify-content:space-between;gap:6px"><span class="nm">${esc(c?.nm||s.n)}</span>${pt.insp?`<span class="tag insp">✦ ${pt.insp}</span>`:''}</div>
+        <div class="sub">${esc(c?.rc||'')} ${esc(c?.cl||'')} &middot; ${esc(s.n)} &middot; AC ${c?sheet(c).ac:'?'}</div>
+        <div class="hpbar" aria-label="HP ${pt.hp} of ${pt.mx}"><i style="width:${w}%;background-position:${w}% 0"></i></div>
+        <div class="sub mono" style="font-size:1rem">${pt.dn?'DOWN ☠':`HP ${pt.hp}/${pt.mx}`}</div>
+      </div>`; }).join('')}</aside>`;
+  }
+  function head(){
+    const pips = S.scene ? Array.from({length:S.n},(_,i)=>`<span class="pip ${i+1<S.scene?'done':i+1===S.scene?'now':''}"></span>`).join('') : '';
+    return `<header class="tv-head">
+      <div class="logo chrome" style="font-family:var(--f-black)">Dummies & Dragons</div>
+      <div class="advtitle holo-text">${esc(S.ttl||'')}</div>
+      ${S.scene?`<div class="row" style="gap:8px"><span class="label">Act ${act()}</span><div class="pips" aria-label="Scene ${S.scene} of ${S.n}">${pips}</div></div>`:''}
+      <div class="codebox">Room <b>${esc(code)}</b></div>
+      <div class="timer" id="timer" aria-live="off"></div>
+    </header>`;
+  }
+  function doneList(){
+    return `<div class="done-list">${S.seats.map(s=>`<span class="${S.sub.includes(s.id)?'in':''}" style="--pc:${seatColor(s.id)}">${esc(s.n)}</span>`).join('')}</div>`;
+  }
+  function stageHTML(){
+    const ph = S.ph;
+    if (ph === 'lobby') {
+      const lens = Object.entries(LENGTHS).map(([k,v])=>`<button class="chip" data-len="${k}" aria-pressed="${G.len===k}">${v.label} &middot; ${v.time}</button>`).join('');
+      return `<div class="stack" style="gap:22px">
+        <div class="row" style="gap:28px;align-items:center">
+          <div class="qr" id="qr" aria-label="QR code to join">${qrSVG(joinURL())}</div>
+          <div class="stack" style="gap:6px;min-width:0"><div class="label">Scan, or go to</div><div class="mono" style="font-size:clamp(1.4rem,3vw,2.2rem);color:var(--chrome);word-break:break-all">${esc(joinURL().replace(/^https?:\/\//,''))}</div><div class="label">Room code</div><div class="bigcode chrome">${esc(code)}</div></div>
+        </div>
+        <div class="seats">${Array.from({length:6},(_,i)=>{ const s=S.seats[i]; return s?`<div class="seat filled" style="--pc:${SEAT_COLORS[i]}"><span class="dot"></span>${esc(s.n)}</div>`:`<div class="seat muted">empty seat</div>`; }).join('')}</div>
+        <div class="stack" style="gap:8px"><div class="label">Adventure length</div><div class="chips">${lens}</div></div>
+        <div class="stack" style="gap:8px"><div class="label">DM brain</div><div class="chips">
+          <button class="chip" data-brain="clever" aria-pressed="${G.brain==='clever'}">Clever (funnier, slower pauses)</button>
+          <button class="chip" data-brain="fast" aria-pressed="${G.brain==='fast'}">Snappy (quicker, simpler)</button></div></div>
+        ${SERVER.mock ? '<p class="err">Test mode: the server has no Anthropic API key, so the DM gives canned replies.</p>' : ''}
+        <div class="row"><button class="btn big" id="startBtn" ${S.seats.length?'':'disabled'}>Start the game</button><span class="muted">${S.seats.length}/6 seated</span></div>
+      </div>`;
+    }
+    if (ph === 'madlibs') return `<div class="stack" style="gap:24px"><h2 class="chrome" style="font-size:clamp(3rem,7vw,5.5rem)">Feed the Beast</h2>
+      <p class="nar">Answer your cursed prompts on your phone. Everything you write becomes part of tonight's adventure: names, places, villains, snacks. Be disgusting.</p>${doneList()}</div>`;
+    if (ph === 'reveal') return `<div class="stack" style="gap:20px"><h2 class="chrome" style="font-size:clamp(2.6rem,6vw,4.5rem)">The Cursed Word Bank</h2>
+      <div class="words">${G.bank.map((b,i)=>`<div class="word" style="animation-delay:${i*.9}s"><small>${esc(b.q)}</small><b>${esc(b.a)}</b><small>by ${esc(b.by)}</small></div>`).join('')}</div></div>`;
+    if (ph === 'chargen') return `<div class="stack" style="gap:20px"><h2 class="chrome" style="font-size:clamp(2.6rem,6vw,4.5rem)">Forge Your Fools</h2>
+      <p class="muted" style="margin:0">Build your character on your phone: pick a race and class, or let fate decide. Locked-in heroes appear below.</p>
+      <div class="ccards">${S.seats.map(s=>{ const c=P(s.id).ch; if(!inp(s.id,'ch')||!c) return `<div class="ccard" style="--pc:${seatColor(s.id)};opacity:.5"><div class="label">${esc(s.n)}</div><div class="muted">still deciding…</div></div>`; const sh=sheet(c);
+        return `<div class="ccard" style="--pc:${seatColor(s.id)}"><div class="label">${esc(s.n)}</div><h3>${esc(c.nm)}</h3><div>${esc(c.rc)} ${esc(c.cl)} &middot; HP ${sh.hp} &middot; AC ${sh.ac}</div><div class="stats">${ABIL.map(a=>`<div><small>${a}</small><b>${sgn(amod(sh.st[a]))}</b></div>`).join('')}</div><div class="muted" style="font-size:.9rem">${esc(c.lk)}</div></div>`; }).join('')}</div>
+      <div class="row"><button class="btn small ghost" id="forceBtn">Everyone's ready, go</button><span class="muted">Anyone not locked in gets a random character.</span></div></div>`;
+    if (ph === 'framework') return `<div class="stack" style="gap:20px"><h2 class="chrome" style="font-size:clamp(2.4rem,5.5vw,4rem)">Choose Your Doom</h2>
+      <div class="opts">${S.fw.map((id,i)=>{ const f=FRAMEWORKS.find(x=>x.id===id); return `<div class="opt"><span class="L">${'ABC'[i]}</span><span class="t" style="font-family:var(--f-black);font-size:1.7rem;line-height:1.1">${esc(f.name)}</span><span>${esc(f.pitch)}</span></div>`; }).join('')}</div>${doneList()}</div>`;
+    if (ph === 'think') return `<div class="think"><div class="orb" role="img" aria-label="The DM is thinking"></div><div class="line" id="thinkLine">${esc(S.msg||'Thinking')}</div>
+      ${S.err ? `<p class="err" style="font-size:1.2rem">${esc(S.err)}</p><div class="row" style="justify-content:center">${retryFn?'<button class="btn" id="retryBtn">Retry</button>':''}<button class="btn ghost" id="skipBtn">Skip ahead without the DM</button></div>` : ''}</div>`;
+    if (ph === 'party') return `<div class="stack" style="gap:20px"><h2 class="chrome" style="font-size:clamp(2.4rem,5.5vw,4rem)">Meet Your Party</h2>
+      <div class="ccards">${S.seats.map((s,i)=>{ const c=P(s.id).ch, l=S.intros.find(x=>x.id===s.id); return `<div class="ccard" style="--pc:${seatColor(s.id)};animation-delay:${i*1.4}s"><h3>${esc(c?.nm||s.n)}</h3><div class="label">${esc(c?.rc||'')} ${esc(c?.cl||'')}</div><div style="font-size:1.1rem">${esc(l?.l||'')}</div></div>`; }).join('')}</div></div>`;
+    if (ph === 'pitch') return `<div class="nar" id="nar"></div><div class="qwrap"><div class="label">What do you do? Pitch it on your phone</div><div class="question">${esc(S.q)}</div>${doneList()}</div>`;
+    if (ph === 'vote') return `<div class="qwrap" style="border:0;padding:0"><div class="label">Vote on your phone</div><div class="question">${esc(S.q)}</div></div>
+      <div class="opts">${S.opts.map((o,i)=>`<div class="opt"><span class="L">${'ABCD'[i]}</span><span class="t">${esc(o.t)}</span><span class="ck">${ckText(o)}</span><span class="by">${o.by?`pitched by ${esc(cname(o.by))}`:'wildcard from the DM'}</span></div>`).join('')}</div>${doneList()}`;
+    if (ph === 'roll' || ph === 'rolled') {
+      const o = S.opts[S.win] || {};
+      const r = S.roll;
+      return `<div class="stack" style="gap:14px;align-items:center;text-align:center">
+        <div class="label">The party chose</div>
+        <div class="question" style="max-width:26ch">${esc(o.t)}</div>
+        <div class="ck" style="font-size:1.5rem">${esc(cname(S.roller))} rolls ${ckText(o)}</div>
+        <div class="d20wrap"><div class="d20 ${r?'rolling':'idle'}" id="bigdie">${d20svg()}<span class="n" id="dieN">${r?'':'?'}</span></div></div>
+        <div id="rollOut" style="min-height:7rem">${r?'':`<div class="waiting">Waiting for ${esc(cname(S.roller))} to roll…</div>`}</div>
+        ${ph==='roll'?`<div class="opts" style="width:100%;margin-top:6px">${S.opts.map((x,i)=>`<div class="opt ${i===S.win?'win':'lose'}" style="padding:10px"><span class="t" style="font-size:1rem">${esc(x.t)}</span><div class="votes">${Array.from({length:S.vc[i]||0},()=> '<i style="--pc:var(--mead)"></i>').join('')}</div></div>`).join('')}</div>`:''}
+      </div>`;
+    }
+    if (ph === 'combat') {
+      const f = S.foe || {n:'?',hp:0,mx:1,ac:0};
+      return `<div class="foe"><div class="row" style="justify-content:space-between"><h3>${esc(f.n)}</h3><span class="mono" style="font-size:1.5rem">AC ${f.ac} &middot; HP ${f.hp}/${f.mx}</span></div><div class="hpbar"><i style="width:${Math.round(100*f.hp/f.mx)}%"></i></div></div>
+        <div class="nar" id="nar"></div>
+        <div class="qwrap"><div class="label">Combat round ${G.round+1}: choose your move and roll on your phone</div><div class="question">${esc(S.q)}</div>${doneList()}</div>`;
+    }
+    if (ph === 'clash') {
+      const f = S.foe;
+      return `<div class="foe"><div class="row" style="justify-content:space-between"><h3>${esc(f.n)}</h3><span class="mono" style="font-size:1.5rem">HP ${f.hp}/${f.mx}</span></div><div class="hpbar"><i style="width:${Math.round(100*f.hp/f.mx)}%"></i></div></div>
+        <div class="opts">${S.clash.map((c,i)=>`<div class="opt" style="animation:pop .4s ${i*.5}s backwards;border-color:${seatColor(c.id)}"><span class="label">${esc(cname(c.id))}</span>
+          ${c.idle?'<span class="t muted">froze up</span>':c.save?`<span class="t">Death save: ${c.d} &middot; ${c.up?'<b style="color:var(--ok)">back up!</b>':'still down'}</span>`:
+          `<span class="L" style="color:${c.crit?'var(--mead)':c.hit?'var(--ok)':'var(--bad)'}">${c.d}</span><span class="t">${c.crit?'CRIT! ':c.hit?'Hit ':c.d===1?'Fumble ':'Miss '}${c.hit?`&middot; ${c.dmg} dmg`:''}</span><span class="ck">total ${c.tot} vs AC ${f.ac}</span>`}</div>`).join('')}</div>`;
+    }
+    if (ph === 'end') {
+      return `<h2 class="chrome" style="font-size:clamp(2.6rem,6vw,4.5rem)">${S.outcome==='win'?'Victory, Somehow':'Total Party Kill'}</h2>
+        <div class="nar" id="nar"></div>
+        <div class="ccards">${S.seats.map(s=>{ const a=S.awards.find(x=>x.id===s.id), st=G.stats[s.id]||{}; return `<div class="ccard" style="--pc:${seatColor(s.id)}"><div class="label">${esc(cname(s.id))}</div><h3>${esc(a?.t||'Participation Trophy')}</h3><div>${esc(a?.w||'They were there.')}</div><div class="muted mono" style="font-size:1.1rem">nat 20s: ${st.n20||0} &middot; nat 1s: ${st.n1||0} &middot; pitches won: ${st.wins||0}</div></div>`; }).join('')}</div>
+        <div class="row"><button class="btn" id="againBtn">New game</button></div>`;
+    }
+    return '';
+  }
+  function typewrite(el, arr){
+    clearInterval(typeTimer);
+    if (!el) return;
+    const full = arr || []; let pi = 0, ci = 0;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { el.innerHTML = paras(full); return; }
+    el.innerHTML = full.map(()=>'<p></p>').join('');
+    const ps = $$('p', el);
+    typeTimer = setInterval(() => {
+      if (pi >= full.length) { clearInterval(typeTimer); return; }
+      ci += 2; ps[pi].textContent = full[pi].slice(0, ci);
+      if (ci >= full[pi].length) { pi++; ci = 0; }
+    }, 22);
+  }
+  function render(full){
+    if (!S) return;
+    const app = $('#app');
+    if (full || S.pid !== lastPid || !$('.tv', app)) {
+      lastPid = S.pid;
+      const rail = partyRail();
+      app.innerHTML = `<div class="tv">${head()}<div class="tv-body ${rail?'':'solo'}"><main class="panel stage" id="stage">${stageHTML()}</main>${rail}</div></div>
+        <div class="controls"><button class="btn small ghost" id="muteBtn">${Sound.muted?'Sound off':'Sound on'}</button>${S.end?'<button class="btn small ghost" id="hurryBtn">Hurry up</button>':''}<button class="btn small ghost" id="quitBtn">Quit</button></div>`;
+      wire();
+      if ($('#nar')) typewrite($('#nar'), S.nar);
+      if (S.ph === 'think') startThinkLines(); else clearInterval(thinkTimer);
+      if (S.ph === 'rolled') animateRoll();
+      tick();
+    } else {
+      // light refresh: only the bits that change inside a phase
+      const dl = $('.done-list'); if (dl) dl.outerHTML = doneList();
+      if (S.ph === 'lobby' || S.ph === 'chargen') { const st = $('#stage'); st.innerHTML = stageHTML(); wire(); }
+      const rail = $('aside.party'); if (rail) rail.outerHTML = partyRail();
+    }
+  }
+  function animateRoll(){
+    const n = $('#dieN'), dieEl = $('#bigdie'), r = S.roll; if (!n || !r) return;
+    let k = 0; const iv = setInterval(() => { n.textContent = die(20); if (++k > 14) { clearInterval(iv); dieEl.classList.remove('rolling'); n.textContent = r.d;
+      $('#rollOut').innerHTML = `<div class="result ${r.res}">${resultText(r.res)}</div><div class="math">${r.adv?`advantage [${r.dice.join(', ')}] → `:''}${r.d} ${sgn(r.m)} = ${r.tot} vs DC ${S.ck.dc}${r.auto?' (auto-rolled)':''}</div>`; } }, 95);
+  }
+  function startThinkLines(){
+    clearInterval(thinkTimer); const el = $('#thinkLine'); if (!el) return;
+    let i = 0; const lines = [S.msg, ...shuffle(THINK_LINES)];
+    thinkTimer = setInterval(() => { i = (i+1) % lines.length; el.textContent = lines[i] + '…'; }, 2600);
+  }
+  function wire(){
+    $('#muteBtn') && ($('#muteBtn').onclick = e => { const m = Sound.toggle(); e.target.textContent = m ? 'Sound off' : 'Sound on'; });
+    $('#hurryBtn') && ($('#hurryBtn').onclick = () => { S.end = Date.now() + 5000; pub(); });
+    $('#quitBtn') && ($('#quitBtn').onclick = e => {
+      if (e.target.dataset.sure) { store.del('rfs-host'); NR?.leave?.(); location.reload(); }
+      else { e.target.dataset.sure = 1; e.target.textContent = 'Tap again to quit'; setTimeout(()=>{ e.target.textContent='Quit'; delete e.target.dataset.sure; }, 3000); }
+    });
+    $('#startBtn') && ($('#startBtn').onclick = () => { Sound.init(); Sound.music('tavern'); startGame(); });
+    $$('[data-len]').forEach(b => b.onclick = () => { G.len = b.dataset.len; render(false); pub(); });
+    $$('[data-brain]').forEach(b => b.onclick = () => { G.brain = b.dataset.brain; render(false); pub(); });
+    $('#forceBtn') && ($('#forceBtn').onclick = () => advance());
+    $('#retryBtn') && ($('#retryBtn').onclick = () => { const f = retryFn; S.err=''; if (f) f(); });
+    $('#skipBtn') && ($('#skipBtn').onclick = () => fallback());
+    $('#againBtn') && ($('#againBtn').onclick = () => {
+      const seats = S.seats; S = fresh(); S.seats = seats; const keep = {}; seats.forEach(s => keep[s.id] = {nm:s.n}); G = Object.assign(freshG(), {len:G.len, brain:G.brain, players:keep});
+      pub(); render(true);
+    });
+  }
+  return { start };
+})();
+
+/* =========================================================
+   PHONE (the controller)
+   ========================================================= */
+const Phone = (() => {
+  let me, code, S = null, lastPid = -1, lastPh = '', hostSeen = 0, draft = {};
+  async function start(c, nm){
+    code = c;
+    const saved = store.get('rfs-player') || {};
+    me = { id: saved.id || uid(), nm, code: c, ch: saved.code === c ? saved.ch || null : null, ml: saved.code === c ? saved.ml || [] : [] };
+    store.set('rfs-player', me);
+    $('#app').innerHTML = `<div class="phone"><div class="waiting" style="margin-top:30vh">Finding table ${esc(c)}…</div></div>`;
+    await capsReady;
+    try { NR = await Net.join(c); } catch (e) {
+      const msg = {no_room:`There's no table called ${c}. Check the code on the TV.`, room_full:'That table is full.'}[e?.code] || "Couldn't reach the table. Check your connection and try again.";
+      $('#app').innerHTML = `<div class="phone"><div class="panel card stack"><div class="ptitle">Can't join</div><p class="muted" style="margin:0">${esc(msg)}</p><button class="btn" id="backBtn">Back</button></div></div>`; $('#backBtn').onclick = titleScreen; return;
+    }
+    send({p:1, id:me.id, nm:me.nm, ch:me.ch, ml:me.ml, inp:null});
+    NR.onPeers(onPeers, () => toast('Lost connection. Reload to rejoin.'));
+    setInterval(tick, 400);
+    setTimeout(() => { if (!S) $('#app').innerHTML = `<div class="phone"><div class="waiting" style="margin-top:20vh">No table called ${esc(code)} yet.</div><p class="muted" style="text-align:center">Check the code on the TV. This screen will connect as soon as the host opens it.</p><button class="btn ghost" onclick="titleScreen()">Change code</button></div>`; }, 6000);
+  }
+  function send(patch){ NR?.presence(patch).catch(()=>{}); }
+  function onPeers({peers}){
+    let host = null;
+    for (const p of peers) { const pr = p.presence; if (pr && pr.h && pr.s && pr.s.code === code && (!host || p.updatedAt > host.updatedAt)) host = p; }
+    if (!host) return;
+    S = host.presence.s; hostSeen = Date.now();
+    render();
+  }
+  function submit(k, extra){ const inp = Object.assign({pid:S.pid, k}, extra); send({inp}); me.inp = inp; Sound.fx('pop'); if (navigator.vibrate) try { navigator.vibrate(30); } catch {} render(true); }
+  function mine(k){ return me.inp && me.inp.pid === S.pid && me.inp.k === k ? me.inp : null; }
+  function seated(){ return S.seats.some(s => s.id === me.id); }
+  function color(){ const i = S.seats.findIndex(s=>s.id===me.id); return SEAT_COLORS[(i<0?0:i)%6]; }
+  function cname(id){ const s = S.seats.find(x=>x.id===id); return id===me.id ? 'You' : (s?.n || 'Someone'); }
+  function tick(){
+    const t = $('#ptimer'); if (!t || !S) return;
+    if (S.end) { const left = Math.max(0, Math.ceil((S.end - Date.now())/1000)); t.textContent = left + 's'; t.style.color = left<=10?'var(--bad)':''; } else t.textContent = '';
+  }
+  function sheetBlock(){
+    if (!me.ch) return '';
+    const sh = sheet(me.ch), pt = S.party?.[me.id];
+    return `<details class="slab sheet"><summary>${esc(me.ch.nm)} &middot; ${pt?`HP ${pt.hp}/${pt.mx}`:`HP ${sh.hp}`}${pt?.insp?` &middot; ✦ ${pt.insp}`:''}</summary>
+      <div class="stack" style="gap:10px;margin-top:10px"><div>${esc(me.ch.rc)} ${esc(me.ch.cl)} &middot; AC ${sh.ac} &middot; Proficiency +2</div>
+      <div class="stats">${ABIL.map(a=>`<div><small>${a}</small><b>${sgn(amod(sh.st[a]))}</b></div>`).join('')}</div>
+      <div class="kv">${sh.cls.sk.map(k=>`<span>${esc(k)} <b>${sgn(checkMod(me.ch,k))}</b></span>`).join('')}</div>
+      <div class="kv"><span>Moves: <b>${esc(sh.cls.moves.join(', '))}</b></span></div>
+      <div class="muted" style="font-size:.9rem">${pt?.insp?'You have Inspiration: spend it for advantage on your next roll.':'Earn Inspiration by being the funniest. Spend it for advantage.'}</div></div></details>`;
+  }
+  function wrap(inner, bar = ''){
+    return `<div class="phone"><div class="phead"><div class="logo chrome" style="font-family:var(--f-black)">Dummies & Dragons</div><div class="mono" id="ptimer" style="font-size:1.6rem"></div></div>
+      <div class="me"><span class="dot" style="--pc:${color()}"></span><span>${esc(me.nm)} &middot; table ${esc(code)}</span></div>
+      ${inner}${['lobby','madlibs','reveal','chargen'].includes(S.ph)?'':sheetBlock()}</div>${bar?`<div class="bar">${bar}</div>`:''}`;
+  }
+  let lastSeated = null;
+  function render(force){
+    if (!S) return;
+    const app = $('#app'), seat = seated();
+    if (!force && S.pid === lastPid && seat === lastSeated && $('.phone', app)) { tick(); return; }
+    if (S.ph !== lastPh && ['vote','roll','combat','end','party'].includes(S.ph)) Sound.fx('ding');
+    lastPh = S.ph; lastPid = S.pid; lastSeated = seat;
+    app.innerHTML = view();
+    wire(); tick();
+    if (S.ph === 'rolled' || S.ph === 'clash') animateMine();
+  }
+  function view(){
+    const ph = S.ph;
+    if (!seated() && ph !== 'lobby') return wrap(`<div class="panel card"><div class="ptitle">Table's full or the game already started</div><p class="muted">Watch the TV, heckle freely, and grab a seat next game.</p></div>`);
+    if (!seated() && ph === 'lobby') return wrap(S.seats.length >= 6 ? `<div class="panel card"><div class="ptitle">The table is full</div><p class="muted">Six seats max. You can still watch the TV.</p></div>` : `<div class="panel card"><div class="waiting">Pulling up a chair…</div></div>`);
+    if (ph === 'lobby') return wrap(`<div class="panel card stack"><div class="ptitle">You're in.</div><p class="muted" style="margin:0">Waiting for the host to start. Make sure you can see the TV.</p></div>`);
+    if (ph === 'madlibs') {
+      const qs = S.ml?.[me.id] || [], done = mine('ml');
+      if (done) return wrap(`<div class="panel card"><div class="ptitle">Locked in.</div><p class="muted">Your words are in the beast's belly now.</p><button class="btn ghost small" id="mlEdit">Change answers</button></div>`);
+      return wrap(`<div class="panel card stack"><div class="ptitle">Feed the Beast</div><p class="muted" style="margin:0">Be specific. Be gross. These end up in the story.</p>
+        ${qs.map((pi,j)=>`<label class="stack" style="gap:6px" for="ml${j}"><span style="font-weight:600">${esc(PROMPTS[pi])}</span><input id="ml${j}" maxlength="60" value="${esc(me.ml?.[j]||'')}"></label>`).join('')}</div>`,
+        `<button class="btn" id="mlSend">Submit</button>`);
+    }
+    if (ph === 'reveal') return wrap(`<div class="panel card"><div class="ptitle">Eyes on the TV</div><p class="muted">The word bank is being revealed. Point and laugh.</p></div>`);
+    if (ph === 'chargen') return chargenView();
+    if (ph === 'framework') {
+      const v = mine('fw')?.v;
+      return wrap(`<div class="stack"><div class="ptitle">Choose your doom</div>${S.fw.map((id,i)=>{ const f=FRAMEWORKS.find(x=>x.id===id); return `<button class="optbtn" data-fw="${id}" aria-pressed="${v===id}"><span class="L">${'ABC'[i]}</span><span><b>${esc(f.name)}</b><small>${esc(f.pitch)}</small></span></button>`; }).join('')}</div>`);
+    }
+    if (ph === 'think') return wrap(`<div class="panel card stack" style="align-items:center;text-align:center"><div class="orb" style="width:120px"></div><div class="waiting">${esc(S.msg||'The DM is thinking')}…</div><p class="muted" style="margin:0">Look at the TV. Dramatic pause in progress.</p></div>`);
+    if (ph === 'party') { const l = S.intros?.find(x=>x.id===me.id); return wrap(`<div class="panel card stack"><div class="label">The camera finds you</div><div class="ptitle">${esc(me.ch?.nm||me.nm)}</div><p style="margin:0;font-size:1.1rem">${esc(l?.l||'')}</p></div>`); }
+    if (ph === 'pitch') {
+      const done = mine('pitch');
+      if (done) return wrap(`<div class="panel card stack"><div class="label">Your pitch</div><p style="margin:0;font-size:1.15rem">${esc(done.v)}</p><button class="btn ghost small" id="pitchEdit">Change it</button></div><div class="waiting">Waiting on the others…</div>`);
+      return wrap(`<div class="stack"><details class="slab sheet"><summary>Read the scene</summary><div style="margin-top:10px">${paras(S.nar)}</div></details>
+        <div class="pq">${esc(S.q)}</div>
+        <label for="pitchIn" class="label">Pitch what the party should do</label>
+        <textarea id="pitchIn" maxlength="200" placeholder="Seduce the barkeep with interpretive dance">${esc(draft.pitch||'')}</textarea><div class="counter" id="pitchCount">0/200</div></div>`,
+        `<button class="btn" id="pitchSend">Pitch it</button>`);
+    }
+    if (ph === 'vote') {
+      const v = mine('vote')?.v;
+      return wrap(`<div class="stack"><div class="pq">${esc(S.q)}</div><div class="label">Vote for the best idea</div>${S.opts.map((o,i)=>`<button class="optbtn" data-vote="${i}" aria-pressed="${v===i}"><span class="L">${'ABCD'[i]}</span><span>${esc(o.t)}<small>${ckText(o)} &middot; ${o.by?esc(cname(o.by)):'DM wildcard'}</small></span></button>`).join('')}</div>`);
+    }
+    if (ph === 'roll') {
+      const o = S.opts[S.win] || {}, mineRoll = S.roller === me.id;
+      if (!mineRoll) return wrap(`<div class="panel card stack" style="text-align:center"><div class="label">The party chose</div><div class="pq">${esc(o.t)}</div><div class="waiting">${esc(cname(S.roller))} is rolling ${ckText(o)}…</div></div>`);
+      if (mine('roll')) return wrap(`<div class="panel card"><div class="waiting">Rolled. Watch the TV.</div></div>`);
+      const m = checkMod(me.ch||{rc:'Human',cl:'Fighter'}, S.ck.sk), insp = S.party?.[me.id]?.insp || 0;
+      return wrap(`<div class="panel card stack" style="text-align:center;align-items:center"><div class="label">It's on you</div><div class="pq">${esc(o.t)}</div>
+        <div class="ck" style="font-size:1.3rem">${ckText(o)} &middot; your bonus ${sgn(m)}</div>
+        <div class="d20 idle" style="width:150px">${d20svg()}<span class="n" style="font-size:3rem">20</span></div>
+        ${insp?`<label class="row" style="gap:8px;justify-content:center"><input type="checkbox" id="advChk" style="width:auto"> Spend Inspiration for advantage (${insp} left)</label>`:''}</div>`,
+        `<button class="btn big" id="rollBtn">Roll the d20</button>`);
+    }
+    if (ph === 'rolled') {
+      const r = S.roll || {};
+      return wrap(`<div class="panel card stack" style="text-align:center;align-items:center"><div class="label">${esc(cname(r.id))} rolled</div><div class="d20 rolling" id="pdie" style="width:150px">${d20svg()}<span class="n" id="pdieN" style="font-size:3rem">?</span></div><div id="pres"></div></div>`);
+    }
+    if (ph === 'combat') {
+      const f = S.foe || {n:'?', hp:0, mx:1, ac:10}, pt = S.party?.[me.id] || {}, done = mine('cbt');
+      const foeBar = `<div class="foe"><b style="font-size:1.2rem">${esc(f.n)}</b><div class="hpbar"><i style="width:${Math.round(100*f.hp/f.mx)}%"></i></div><span class="mono">AC ${f.ac} &middot; HP ${f.hp}/${f.mx}</span></div>`;
+      if (done) return wrap(`${foeBar}<div class="panel card"><div class="waiting">Rolled a ${Math.max(...done.d)}. Waiting on the others…</div></div>`);
+      if (pt.dn) return wrap(`${foeBar}<div class="panel card stack"><div class="ptitle">You're down</div><p class="muted" style="margin:0">Roll a death save. 10 or higher and you're back on your feet. A 20 brings you back strong.</p></div>`, `<button class="btn big" id="saveBtn">Death save</button>`);
+      const c = CLASSES[me.ch?.cl] || CLASSES.Fighter, m = atkMod(me.ch||{rc:'Human',cl:'Fighter'});
+      const moves = ['Attack', ...c.moves, 'Something unhinged'];
+      return wrap(`${foeBar}<div class="stack"><div class="pq">${esc(S.q)}</div>
+        <div class="label">Your move</div><div class="chips">${moves.map(mv=>`<button class="chip" data-mv="${esc(mv)}" aria-pressed="${draft.mv===mv}">${esc(mv)}</button>`).join('')}</div>
+        <label for="cbtIn" class="label">Describe it (optional)</label><textarea id="cbtIn" maxlength="140" placeholder="Kick it square in the crotch">${esc(draft.cbt||'')}</textarea>
+        <div class="muted">Attack bonus ${sgn(m)} vs AC ${f.ac}</div>
+        ${pt.insp?`<label class="row" style="gap:8px"><input type="checkbox" id="advChk" style="width:auto"> Spend Inspiration for advantage</label>`:''}</div>`,
+        `<button class="btn big" id="cbtBtn">Roll to hit</button>`);
+    }
+    if (ph === 'clash') { return wrap(`<div class="panel card stack" style="text-align:center"><div class="label">This round</div><div id="pres" class="stack"></div><p class="muted">Watch the TV.</p></div>`); }
+    if (ph === 'end') { const a = S.awards?.find(x=>x.id===me.id); return wrap(`<div class="panel card stack"><div class="label">${S.outcome==='win'?'You survived':'You died'}</div><div class="ptitle">${esc(a?.t||'Participation Trophy')}</div><p style="margin:0">${esc(a?.w||'')}</p><p class="muted" style="margin:0">Thanks for playing. The host can start a new game from the TV.</p></div>`); }
+    return wrap('');
+  }
+  /* --- character creation --- */
+  function cg(){ if (!draft.ch) draft.ch = me.ch ? {...me.ch} : {nm:'', rc:'Human', cl:'Fighter', lk:''}; return draft.ch; }
+  function chargenView(){
+    const ch = cg(), locked = mine('ch');
+    if (locked) return wrap(`<div class="panel card stack"><div class="ptitle">${esc(me.ch.nm)} is ready</div><p class="muted" style="margin:0">${esc(me.ch.rc)} ${esc(me.ch.cl)}. Watch the TV for your rivals.</p><button class="btn ghost small" id="cgEdit">Edit character</button></div>`);
+    const sh = sheet(ch);
+    return wrap(`<div class="stack"><div class="ptitle">Forge your fool</div>
+      <button class="btn ghost small" id="cgRand">Randomize everything</button>
+      <label class="label" for="cgName">Character name</label><input id="cgName" maxlength="28" value="${esc(ch.nm)}" placeholder="Brock Thunderloins">
+      <div class="label">Race</div><div class="chips">${Object.keys(RACES).map(r=>`<button class="chip" data-rc="${r}" aria-pressed="${ch.rc===r}">${r}</button>`).join('')}</div>
+      <div class="muted" style="font-size:.9rem">${esc(RACES[ch.rc].t)}</div>
+      <div class="label">Class</div><div class="classgrid">${Object.entries(CLASSES).map(([k,v])=>`<button class="chip" data-cl="${k}" aria-pressed="${ch.cl===k}">${k}<small>${esc(v.blurb)}</small></button>`).join('')}</div>
+      <label class="label" for="cgLook">What do you look like?</label><textarea id="cgLook" maxlength="200" placeholder="A nervous halfling who carries too many spoons">${esc(ch.lk)}</textarea>
+      <div class="slab" style="padding:12px" id="cgSheet">${sheetMini(ch)}</div></div>`,
+      `<button class="btn" id="cgLock">Lock in</button>`);
+  }
+  function sheetMini(ch){ const sh = sheet(ch); return `<div class="row" style="justify-content:space-between"><b>${esc(ch.rc)} ${esc(ch.cl)}</b><span class="mono" style="font-size:1.2rem">HP ${sh.hp} &middot; AC ${sh.ac}</span></div>
+      <div class="stats" style="margin:8px 0">${ABIL.map(a=>`<div><small>${a}</small><b>${sh.st[a]}</b><small>${sgn(amod(sh.st[a]))}</small></div>`).join('')}</div>
+      <div class="kv">Skills: ${sh.cls.sk.map(k=>`<span>${esc(k)} <b>${sgn(checkMod(ch,k))}</b></span>`).join('')}</div><div class="kv" style="margin-top:4px">Moves: <b>${esc(sh.cls.moves.join(', '))}</b></div>`; }
+  function animateMine(){
+    if (S.ph === 'rolled') {
+      const r = S.roll || {}, n = $('#pdieN'), d = $('#pdie'); let k = 0;
+      Sound.fx('dice');
+      const iv = setInterval(() => { if (!n) return clearInterval(iv); n.textContent = die(20); if (++k > 12) { clearInterval(iv); d.classList.remove('rolling'); n.textContent = r.d; $('#pres').innerHTML = `<div class="result ${r.res}" style="font-size:2.2rem">${resultText(r.res)}</div><div class="math" style="font-size:1.3rem">${r.d} ${sgn(r.m)} = ${r.tot} vs DC ${S.ck?.dc}</div>`; } }, 95);
+    } else if (S.ph === 'clash') {
+      const c = S.clash?.find(x=>x.id===me.id), el = $('#pres'); if (!el) return;
+      if (!c) { el.innerHTML = '<div class="waiting">You sat this one out.</div>'; return; }
+      el.innerHTML = c.idle ? '<div class="result fail" style="font-size:2rem">You froze up</div>' : c.save ? `<div class="result ${c.up?'success':'fail'}" style="font-size:2rem">${c.up?'Back on your feet!':'Still down'}</div><div class="math">death save ${c.d}</div>`
+        : `<div class="result ${c.crit?'crit':c.hit?'success':c.d===1?'fumble':'fail'}" style="font-size:2.4rem">${c.crit?'CRITICAL HIT':c.hit?'Hit':c.d===1?'Fumble':'Miss'}</div><div class="math">${c.d} → ${c.tot} vs AC ${S.foe?.ac}${c.hit?` &middot; ${c.dmg} damage`:''}</div>`;
+    }
+  }
+  function rollDice(){ const adv = $('#advChk')?.checked; return adv ? [die(20), die(20)] : [die(20)]; }
+  function wire(){
+    $('#mlSend') && ($('#mlSend').onclick = () => {
+      const qs = S.ml?.[me.id] || []; me.ml = qs.map((_,j) => clip($('#ml'+j)?.value, 60));
+      if (me.ml.some(a=>!a)) return toast('Fill in every prompt');
+      store.set('rfs-player', me); send({ml: me.ml}); submit('ml');
+    });
+    $('#mlEdit') && ($('#mlEdit').onclick = () => { me.inp = null; send({inp:null}); render(true); });
+    // chargen
+    const ch = S.ph === 'chargen' ? cg() : null;
+    const refresh = () => { const el = $('#cgSheet'); if (el) el.innerHTML = sheetMini(ch); };
+    $$('[data-rc]').forEach(b => b.onclick = () => { ch.rc = b.dataset.rc; ch.nm = $('#cgName').value; ch.lk = $('#cgLook').value; render(true); });
+    $$('[data-cl]').forEach(b => b.onclick = () => { ch.cl = b.dataset.cl; ch.nm = $('#cgName').value; ch.lk = $('#cgLook').value; render(true); });
+    $('#cgName') && ($('#cgName').oninput = e => ch.nm = e.target.value);
+    $('#cgLook') && ($('#cgLook').oninput = e => ch.lk = e.target.value);
+    $('#cgRand') && ($('#cgRand').onclick = () => { Object.assign(ch, {nm: pick(NAME_A)+' '+pick(NAME_B), rc: pick(Object.keys(RACES)), cl: pick(Object.keys(CLASSES)), lk: pick(LOOKS)}); Sound.fx('dice'); render(true); });
+    $('#cgLock') && ($('#cgLock').onclick = () => {
+      ch.nm = clip($('#cgName').value, 28) || pick(NAME_A)+' '+pick(NAME_B); ch.lk = clip($('#cgLook').value, 200) || pick(LOOKS);
+      me.ch = {...ch}; store.set('rfs-player', me); send({ch: me.ch}); submit('ch');
+    });
+    $('#cgEdit') && ($('#cgEdit').onclick = () => { me.inp = null; draft.ch = {...me.ch}; send({inp:null}); render(true); });
+    $$('[data-fw]').forEach(b => b.onclick = () => submit('fw', {v:b.dataset.fw}));
+    $$('[data-vote]').forEach(b => b.onclick = () => submit('vote', {v:parseInt(b.dataset.vote)}));
+    const pi = $('#pitchIn');
+    if (pi) { const upd = () => { draft.pitch = pi.value; $('#pitchCount').textContent = pi.value.length + '/200'; }; pi.oninput = upd; upd(); }
+    $('#pitchSend') && ($('#pitchSend').onclick = () => { const v = clip(pi.value, 200); if (!v) return toast('Pitch something, coward'); draft.pitch = ''; submit('pitch', {v}); });
+    $('#pitchEdit') && ($('#pitchEdit').onclick = () => { draft.pitch = me.inp?.v || ''; me.inp = null; send({inp:null}); render(true); });
+    $('#rollBtn') && ($('#rollBtn').onclick = () => { Sound.fx('dice'); submit('roll', {d: rollDice()}); });
+    $$('[data-mv]').forEach(b => b.onclick = () => { draft.mv = b.dataset.mv; draft.cbt = $('#cbtIn').value; render(true); });
+    $('#cbtIn') && ($('#cbtIn').oninput = e => draft.cbt = e.target.value);
+    $('#cbtBtn') && ($('#cbtBtn').onclick = () => { const t = clip(((draft.mv||'Attack') + ': ' + ($('#cbtIn').value||'')).replace(/:\s*$/,''), 140); draft.cbt=''; Sound.fx('dice'); submit('cbt', {t, d: rollDice()}); });
+    $('#saveBtn') && ($('#saveBtn').onclick = () => { Sound.fx('dice'); submit('cbt', {t:'death save', d:[die(20)]}); });
+  }
+  return { start };
+})();
+
+titleScreen();
+</script>
+</body>
+</html>

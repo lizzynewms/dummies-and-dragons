@@ -1,0 +1,17 @@
+{
+  "name": "dummies-and-dragons",
+  "version": "1.0.0",
+  "description": "A Jackbox-style comedy D&D one-shot with an AI dungeon master. One TV, up to six phones.",
+  "main": "server.js",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "dev": "MOCK_DM=1 node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ws": "8.18.0"
+  }
+}
