@@ -40,7 +40,7 @@ body{margin:0;font-synthesis:none;background:var(--void);color:var(--chrome);fon
 body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:49;background:radial-gradient(ellipse at center,transparent 55%,#000a 100%),repeating-linear-gradient(0deg,#0000 0 2px,#0000000f 2px 3px)}
 #app{position:relative;z-index:1;min-height:100%;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px;box-sizing:border-box}
 h1,h2,h3{font-family:var(--f-black);font-weight:400;margin:0;text-wrap:balance;letter-spacing:.01em}
-.chrome{background:linear-gradient(180deg,#fff 0%,#e3e0ef 38%,#6b6382 50%,#d9d4ea 62%,#fff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 #00000080) drop-shadow(0 0 18px #ff4fb855)}
+.chrome{padding-bottom:.18em;margin-bottom:-.18em;background:linear-gradient(180deg,#fff 0%,#e3e0ef 38%,#6b6382 50%,#d9d4ea 62%,#fff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 #00000080) drop-shadow(0 0 18px #ff4fb855)}
 .holo-text{background:var(--holo);-webkit-background-clip:text;background-clip:text;color:transparent}
 .mono{font-family:var(--f-mono);letter-spacing:.06em}
 .label{font-family:var(--f-mono);font-size:1.15rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
@@ -69,7 +69,7 @@ textarea{resize:vertical;min-height:5.5em}
 
 /* ---------- title / mode select ---------- */
 .title-screen{max-width:760px;margin:4vh auto 0;display:flex;flex-direction:column;gap:22px;align-items:center;text-align:center}
-.logo{font-size:clamp(3.4rem,13vw,7.5rem);line-height:.9}
+.logo{font-size:clamp(3.4rem,13vw,7.5rem);line-height:1.05}
 .tagline{font-family:var(--f-mono);font-size:1.4rem;letter-spacing:.14em;color:var(--hex);text-transform:uppercase}
 .mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;width:100%}
 .mode-grid .panel{padding:22px;display:flex;flex-direction:column;gap:12px;text-align:left}
@@ -406,7 +406,13 @@ const Voice = (() => {
     const st = STYLE[String(style||'').toLowerCase()];
     return {v, p: st ? st[0] : .75 + (hash(name) % 8)/10, r: st ? st[1] : .9 + (hash(name+'r') % 3)/10};
   }
-  const clean = t => String(t).replace(/[*_#~`]/g, '').replace(/\s+/g, ' ').trim();
+  // browser voices spell out ALL-CAPS words letter by letter ("O-W-W"), so say shouted words as normal words
+  const KEEP_CAPS = new Set(['DM','NPC','HP','AC','DC','XP','OK','TV','D&D','II','III','IV']);
+  const clean = t => String(t).replace(/[*_#~`]/g, '')
+    .replace(/\b[A-Z][A-Z'\u2019-]+\b/g, w => KEEP_CAPS.has(w) ? w : w.charAt(0) + w.slice(1).toLowerCase())
+    .replace(/([a-z])\1{3,}/g, '$1$1$1')
+    .replace(/([!?])[!?]+/g, '$1')
+    .replace(/\s+/g, ' ').trim();
   const chunks = t => (clean(t).match(/[^.!?…]+[.!?…]+["”')]*|[^.!?…]+$/g) || []).map(x => x.trim()).filter(Boolean);
   const ok = () => !!ss && voices.length > 0;
   function say(lines, cast = {}){
