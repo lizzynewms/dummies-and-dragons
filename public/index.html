@@ -7,9 +7,14 @@
 <meta name="description" content="A Jackbox-style comedy D&D one-shot. One TV, up to six phones, an AI dungeon master with no filter.">
 <title>Dummies & Dragons</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,3 93,27 93,73 50,97 7,73 7,27' fill='%23ff4fb8'/%3E%3Ctext x='50' y='64' font-size='38' text-anchor='middle' font-family='Georgia' font-weight='bold' fill='%231a0f24'%3E20%3C/text%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Chakra+Petch:wght@400;500;600;700&family=VT323&display=swap">
+<link rel="preload" href="/fonts/new-rocker-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+@font-face{font-family:"New Rocker";src:url(/fonts/new-rocker-latin-400-normal.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Chakra Petch";src:url(/fonts/chakra-petch-latin-400-normal.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Chakra Petch";src:url(/fonts/chakra-petch-latin-500-normal.woff2) format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:"Chakra Petch";src:url(/fonts/chakra-petch-latin-600-normal.woff2) format("woff2");font-weight:600;font-display:swap}
+@font-face{font-family:"Chakra Petch";src:url(/fonts/chakra-petch-latin-700-normal.woff2) format("woff2");font-weight:700;font-display:swap}
+@font-face{font-family:"VT323";src:url(/fonts/vt323-latin-400-normal.woff2) format("woff2");font-weight:400;font-display:swap}
 /* Layout: one-screen app. TV = header / stage + party rail. Phone = stacked controller with sticky action bar. */
 :root{
   color-scheme: dark;
@@ -18,7 +23,7 @@
   --ok:#7dffb0; --bad:#ff5d6c;
   --holo:linear-gradient(115deg,#7ff3ff 0%,#c9a7ff 30%,#ff9ad5 55%,#ffe58a 75%,#9dffcf 100%);
   --p1:#ff4fb8; --p2:#7ff3ff; --p3:#d8ff8a; --p4:#ffcf5a; --p5:#c9a7ff; --p6:#ff8a5c;
-  --f-black:"UnifrakturCook","Pirata One","Old English Text MT",Georgia,serif;
+  --f-black:"New Rocker","Old English Text MT",Georgia,serif;
   --f-body:"Chakra Petch","Segoe UI",system-ui,sans-serif;
   --f-mono:"VT323",ui-monospace,"Courier New",monospace;
   --r:14px;
@@ -28,13 +33,13 @@ html{-webkit-text-size-adjust:100%;padding-top:env(safe-area-inset-top,0px);padd
 [hidden]{display:none!important}
 img{max-width:100%}
 html,body{height:100%}
-body{margin:0;background:var(--void);color:var(--chrome);font-family:var(--f-body);font-size:16px;line-height:1.5;
+body{margin:0;font-synthesis:none;background:var(--void);color:var(--chrome);font-family:var(--f-body);font-size:16px;line-height:1.5;
   background-image:radial-gradient(1200px 700px at 15% -10%,#3b1a5c 0%,transparent 60%),radial-gradient(900px 600px at 110% 110%,#4a1238 0%,transparent 55%),radial-gradient(1px 1px at 20px 30px,#fff6 50%,transparent 51%),radial-gradient(1px 1px at 120px 80px,#fff4 50%,transparent 51%),radial-gradient(1.5px 1.5px at 70px 160px,#ffd6f080 50%,transparent 51%);
   background-size:auto,auto,190px 190px,240px 240px,310px 310px;background-attachment:fixed;overflow-x:hidden}
 #grain{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50;opacity:.13;mix-blend-mode:overlay;image-rendering:pixelated}
 body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:49;background:radial-gradient(ellipse at center,transparent 55%,#000a 100%),repeating-linear-gradient(0deg,#0000 0 2px,#0000000f 2px 3px)}
 #app{position:relative;z-index:1;min-height:100%;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px;box-sizing:border-box}
-h1,h2,h3{font-family:var(--f-black);font-weight:700;margin:0;text-wrap:balance;letter-spacing:.01em}
+h1,h2,h3{font-family:var(--f-black);font-weight:400;margin:0;text-wrap:balance;letter-spacing:.01em}
 .chrome{background:linear-gradient(180deg,#fff 0%,#e3e0ef 38%,#6b6382 50%,#d9d4ea 62%,#fff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 #00000080) drop-shadow(0 0 18px #ff4fb855)}
 .holo-text{background:var(--holo);-webkit-background-clip:text;background-clip:text;color:transparent}
 .mono{font-family:var(--f-mono);letter-spacing:.06em}
@@ -98,7 +103,18 @@ textarea{resize:vertical;min-height:5.5em}
 .pcard .nm{font-weight:700;font-size:1.05rem;line-height:1.2}
 .pcard .sub{font-size:.85rem;color:var(--dim)}
 .hpbar{height:8px;border-radius:99px;background:#0008;overflow:hidden;border:1px solid #ffffff1a}
-.hpbar i{display:block;height:100%;background:linear-gradient(90deg,var(--bad),var(--mead) 50%,var(--ok));background-size:300% 100%;transition:width .6s}
+.hpbar i{display:block;height:100%;background:var(--hpc,var(--ok));transition:width .6s,background-color .6s;box-shadow:0 0 10px var(--hpc,var(--ok))}
+.pcard.low{border-color:var(--bad);animation:lowpulse 1.4s ease-in-out infinite}
+@keyframes lowpulse{50%{box-shadow:0 0 0 2px var(--bad),0 0 24px #ff5d6c80}}
+.hpnum{font-family:var(--f-mono);font-size:1.15rem;color:var(--hpc,var(--ok))}
+.myhp{padding:12px 14px;border-radius:14px;background:#ffffff0a;border:2px solid var(--hpc,var(--ok));display:flex;flex-direction:column;gap:8px}
+.myhp .hpbar{height:16px}
+.myhp .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.myhp .big{font-family:var(--f-mono);font-size:2rem;line-height:1;color:var(--hpc,var(--ok))}
+.myhp.low{animation:lowpulse 1.4s ease-in-out infinite}
+.myhp.down{border-color:var(--dim);filter:grayscale(.6)}
+.npc{color:var(--mead);font-style:italic;padding-left:.9em;border-left:3px solid var(--mead)}
+.npc b{font-style:normal;font-family:var(--f-mono);letter-spacing:.06em;font-size:.95em;color:var(--hex)}
 .pcard.down{opacity:.55;filter:grayscale(.7)}
 .tag{font-family:var(--f-mono);font-size:1rem;letter-spacing:.08em;padding:0 .45em;border-radius:6px;background:#ffffff14}
 .tag.insp{background:var(--mead);color:#1a0f24}
@@ -292,6 +308,7 @@ const LOOKS = ['a towering mess of scars and regret wearing one (1) boot','smell
   'one eye, two eyepatches, nobody asks','dressed head to toe in leather that is clearly too tight'];
 const THINK_LINES = ['Rolling behind the screen','Consulting the Monster Manual','Pretending this was planned','Doing a funny voice','Inventing a tavern menu','Checking the rules (ignoring them)','Sharpening the dice','Hiding a mimic somewhere','Asking the gods for a vibe check','Nerfing your plan'];
 const SEAT_COLORS = ['var(--p1)','var(--p2)','var(--p3)','var(--p4)','var(--p5)','var(--p6)'];
+const PITCH_SECS = 120, COMBAT_SECS = 75;
 const LENGTHS = {quick:{n:6,label:'Quick',time:'about 45 min'}, standard:{n:9,label:'Standard',time:'about 75 min'}, epic:{n:12,label:'Epic',time:'up to 2 hours'}};
 
 /* ---------------- FILM GRAIN ---------------- */
@@ -365,7 +382,67 @@ const Sound = (() => {
     else if (name==='gong'){ tone(t,hz(40),3,'sine',.4,sfx,.01); tone(t,hz(52.3),2.5,'triangle',.15,sfx,.01); noise(t,.6,.15,300,.5); }
   }
   function toggle(){ init(); muted = !muted; store.set('rfs-mute', muted); if (master) master.gain.value = muted ? 0 : .75; return muted; }
-  return { init, music, fx, toggle, get muted(){ return muted; } };
+  function duck(d){ if (!ctx || !mus) return; mus.gain.setTargetAtTime(d ? .14 : .5, ctx.currentTime, .25); }
+  return { init, music, fx, toggle, duck, get muted(){ return muted; } };
+})();
+
+/* ---------------- VOICES (browser text-to-speech: narrator + NPC voices) ---------------- */
+const Voice = (() => {
+  const ss = window.speechSynthesis;
+  let voices = [], narr = null, on = store.get('rfs-voice') !== false, primed = false, gen = 0;
+  // pitch, rate per NPC voice style the DM assigns
+  const STYLE = {deep:[.5,.9], gravelly:[.6,.86], booming:[.7,.9], high:[1.45,1.08], squeaky:[1.9,1.22], posh:[1.08,.94], old:[.78,.78],
+    sinister:[.62,.82], nasal:[1.3,1.06], sultry:[.85,.84], child:[1.75,1.12], monster:[.3,.8], drunk:[.9,.78], cheerful:[1.25,1.1]};
+  const score = v => (/natural|neural|premium|enhanced/i.test(v.name) ? 6 : 0) + (/Google UK English Male|Daniel|Arthur|Ryan|Guy|Christopher|Brian|Andrew|Oliver|George|Thomas|Rishi/i.test(v.name) ? 4 : 0) + (/en-GB/i.test(v.lang) ? 1 : 0) + (v.localService === false ? 1 : 0);
+  function load(){
+    if (!ss) return;
+    voices = ss.getVoices().filter(v => /^en(-|_|$)/i.test(v.lang) && !/(Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Good News|Jester|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Albert)/i.test(v.name));
+    narr = voices.slice().sort((a,b) => score(b) - score(a))[0] || null;
+  }
+  if (ss) { load(); ss.addEventListener?.('voiceschanged', load); }
+  const hash = s => { let h = 7; for (const c of String(s)) h = (h*31 + c.charCodeAt(0)) | 0; return Math.abs(h); };
+  function npcVoice(name, style){
+    const pool = voices.filter(v => v !== narr), v = pool.length ? pool[hash(name) % pool.length] : narr;
+    const st = STYLE[String(style||'').toLowerCase()];
+    return {v, p: st ? st[0] : .75 + (hash(name) % 8)/10, r: st ? st[1] : .9 + (hash(name+'r') % 3)/10};
+  }
+  const clean = t => String(t).replace(/[*_#~`]/g, '').replace(/\s+/g, ' ').trim();
+  const chunks = t => (clean(t).match(/[^.!?…]+[.!?…]+["”')]*|[^.!?…]+$/g) || []).map(x => x.trim()).filter(Boolean);
+  const ok = () => !!ss && voices.length > 0;
+  function say(lines, cast = {}){
+    if (!on || !ok()) return;
+    const mine = ++gen; ss.cancel();
+    const items = [];
+    lines.filter(Boolean).forEach(line => {
+      const n = isNpc(line) && npcSplit(line);
+      if (n) { const vv = npcVoice(n.who, cast[n.who]); chunks(n.say).forEach(t => items.push({t, ...vv})); }
+      else chunks(line).forEach(t => items.push({t, v: narr, p: .9, r: 1}));
+    });
+    if (!items.length) return;
+    setTimeout(() => {           // Chrome drops utterances queued in the same tick as cancel()
+      if (mine !== gen) return;
+      Sound.duck(true);
+      items.forEach((it, i) => {
+        const u = new SpeechSynthesisUtterance(it.t);
+        if (it.v) { u.voice = it.v; u.lang = it.v.lang; }
+        u.pitch = clamp(it.p, 0, 2); u.rate = clamp(it.r, .5, 2);
+        if (i === items.length - 1) u.onend = u.onerror = () => { if (mine === gen) Sound.duck(false); };
+        ss.speak(u);
+      });
+    }, 80);
+  }
+  function stop(){ gen++; if (ss) ss.cancel(); Sound.duck(false); }
+  // rough seconds of speech, used to give players extra time while the DM talks
+  function estimate(lines){ if (!on || !ok()) return 0; const words = lines.join(' ').split(/\s+/).filter(Boolean).length; return Math.ceil(words / 2.5) + 2; }
+  function prime(){ if (primed || !ss) return; primed = true; try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; ss.speak(u); } catch {} }
+  function toggle(){ on = !on; store.set('rfs-voice', on); if (!on) stop(); return on; }
+  function sample(){
+    say(['Welcome, dummies. I am your dungeon master, and I have already decided most of you will die.',
+         'Grumbo the Barkeep: "Oi! Wipe your boots before you bleed on my floor."',
+         'Lady Gristle: "Darling, is that a goblin or your husband?"'], {'Grumbo the Barkeep':'gravelly', 'Lady Gristle':'posh'});
+  }
+  document.addEventListener('pointerdown', prime, {capture:true});
+  return { say, stop, estimate, toggle, sample, get on(){ return on; }, get ok(){ return ok(); } };
 })();
 
 /* ---------------- NETWORK (WebSocket room relay + AI DM endpoint) ---------------- */
@@ -429,8 +506,11 @@ function d20svg(){
   <polygon points="50,22 78,66 22,66" fill="#ffffff55" stroke="#1a0f24" stroke-width="2"/>
   <path d="M50 3 L50 22 M93 27 L78 66 M7 27 L22 66 M50 97 L22 66 M50 97 L78 66 M93 73 L78 66 M7 73 L22 66 M7 27 L50 22 L93 27" stroke="#1a0f24" stroke-width="2" fill="none"/></svg>`;
 }
+function hpColor(hp, mx){ const r = mx ? hp/mx : 0; return r > .6 ? 'var(--ok)' : r > .3 ? 'var(--mead)' : 'var(--bad)'; }
+function isNpc(line){ return /^([A-Z][^:"“]{1,40}):\s*["“]/.test(line); }
+function npcSplit(line){ const m = line.match(/^([^:]{1,41}):\s*["“](.*?)["”]?\s*$/s); return m ? {who:m[1].trim(), say:m[2].trim()} : null; }
 function resultText(res){ return {crit:'NATURAL 20!', success:'Success', fail:'Failure', fumble:'NATURAL 1'}[res] || ''; }
-function paras(arr){ return (arr||[]).map(p=>`<p>${esc(p)}</p>`).join(''); }
+function paras(arr){ return (arr||[]).map(p => { const n = isNpc(p) && npcSplit(p); return n ? `<p class="npc"><b>${esc(n.who)}</b> “${esc(n.say)}”</p>` : `<p>${esc(p)}</p>`; }).join(''); }
 function ckText(o){ if(!o) return ''; const ab = SKILLS[o.sk] || o.sk; return `${esc(ab)} (${esc(o.sk)}) DC ${o.dc}`; }
 
 /* =========================================================
@@ -529,7 +609,7 @@ const Host = (() => {
       const prev = G.players[pr.id];
       const nm = clip(pr.nm, 16) || 'Someone';
       const ch = pr.ch && CLASSES[pr.ch.cl] && RACES[pr.ch.rc] ? {nm:clip(pr.ch.nm,28)||nm, rc:pr.ch.rc, cl:pr.ch.cl, lk:clip(pr.ch.lk,200)} : (prev?.ch || null);
-      G.players[pr.id] = {nm, ch, ml: Array.isArray(pr.ml) ? pr.ml.slice(0,3).map(a=>clip(a,60)) : (prev?.ml||[]), inp: pr.inp && typeof pr.inp === 'object' ? pr.inp : null};
+      G.players[pr.id] = {nm, ch, ml: Array.isArray(pr.ml) ? pr.ml.slice(0,3).map(a=>clip(a,60)) : (prev?.ml||[]), inp: pr.inp && typeof pr.inp === 'object' ? pr.inp : null, draft: pr.draft && typeof pr.draft === 'object' ? {pid: pr.draft.pid, v: clip(pr.draft.v, 200)} : null};
       if (!prev) changed = true;
       lastSeen[pr.id] = Date.now();
       if (S.ph === 'lobby' && !S.seats.find(s=>s.id===pr.id) && S.seats.length < 6){ S.seats.push({id:pr.id, n:nm}); Sound.fx('pop'); changed = true; }
@@ -553,6 +633,7 @@ const Host = (() => {
   function inp(id, k){ const i = P(id).inp; return i && i.pid === S.pid && i.k === k ? i : null; }
   function setPhase(ph, secs = 0, extra = {}){
     S.ph = ph; S.pid++; S.end = secs ? Date.now() + secs*1000 : 0; S.sub = []; S.err = ''; Object.assign(S, extra);
+    if (S.end && ['pitch','combat','party'].includes(ph)) S.end += Voice.estimate(spoken()) * 1000;
     pub(); render(true);
   }
   function standing(){ return S.seats.filter(s => !S.party[s.id]?.dn); }
@@ -595,7 +676,7 @@ const Host = (() => {
     if (ph === 'reveal') return setPhase('chargen', 0);
     if (ph === 'chargen') return endChargen();
     if (ph === 'framework') return endFramework();
-    if (ph === 'party') return setPhase('pitch', 90);
+    if (ph === 'party') return setPhase('pitch', PITCH_SECS);
     if (ph === 'pitch') return endPitch();
     if (ph === 'vote') return endVote();
     if (ph === 'roll') return endRoll();
@@ -630,7 +711,15 @@ const Host = (() => {
     S.scene = 1;
     runAI('Writing the opening scene', aiIntro);
   }
-  function endPitch(){ runAI('Reading your terrible ideas', aiOptions); }
+  function endPitch(){
+    // grab pitches now: once the phase changes, submissions from this phase no longer match
+    G.pitches = S.seats.map(s => {
+      const sub = inp(s.id,'pitch')?.v, d = P(s.id).draft;
+      const draft = d && d.pid === S.pid ? d.v : '';
+      return {id:s.id, t:clip(sub || draft, 200)};
+    }).filter(p => p.t);
+    runAI('Reading your terrible ideas', aiOptions);
+  }
   function endVote(){
     const vc = S.opts.map(() => 0); S.seats.forEach(s => { const i = inp(s.id,'vote'); if (i && Number.isInteger(i.v) && i.v >= 0 && i.v < vc.length) vc[i.v]++; });
     const max = Math.max(...vc); const win = pick(vc.map((c,i)=>c===max?i:-1).filter(i=>i>=0));
@@ -687,6 +776,8 @@ const Host = (() => {
 Tone: crude, profane, absurd, R-rated comedy. Swearing, gross-out humor, innuendo and roasting the player characters are all welcome. No explicit sex, no slurs, nothing about real people.
 Style: punchy and fast. Short paragraphs, vivid specifics, NPCs with funny voices quoted in dialogue. Address the party as "you" and use character names. Never decide what a player character says or does beyond the action they chose.
 Rules: real D&D 5e logic. Ability checks use the 18 5e skills. DCs: easy 10, medium 13, hard 16, very hard 19. A natural 20 is a legendary success; a natural 1 is a humiliating disaster.
+Dialogue: give NPCs real lines of dialogue. Put every line an NPC speaks in its own paragraph, exactly like this: Grumbo the Barkeep: "Wipe your boots, you animals." Keep each NPC's name short and identical every time they talk. Narration paragraphs must not contain dialogue. Never write dialogue for the player characters.
+Voices: every reply that has narration also includes "cast": an object giving each NPC who speaks in it a voice, e.g. {"Grumbo the Barkeep":"gravelly"}. Voices: deep, gravelly, booming, high, squeaky, posh, old, sinister, nasal, sultry, child, monster, drunk, cheerful. Keep an NPC's voice the same all game. Use {} when no NPC speaks.
 Reply with ONLY the JSON object requested.`;
   function context(){
     const f = fw();
@@ -704,10 +795,13 @@ ${bank}
 PARTY:
 ${party}
 
+NPC VOICES ALREADY CAST (reuse these names and voices): ${Object.keys(G.cast||{}).length ? Object.entries(G.cast).map(([k,v])=>k+' = '+v).join('; ') : '(none yet)'}
+
 STORY SO FAR:
 ${G.log.length ? G.log.map((l,i)=>`${i+1}. ${l}`).join('\n') : '(just starting)'}`;
   }
-  function narArr(t){ return String(t||'').split(/\n\s*\n|\n/).map(p=>clip(p,700)).filter(Boolean).slice(0,5); }
+  function narArr(t){ return String(t||'').split(/\n\s*\n|\n/).map(p=>clip(p,700)).filter(Boolean).slice(0,9); }
+  function castMerge(c){ if (!c || typeof c !== 'object') return; G.cast = G.cast || {}; for (const [k,v] of Object.entries(c).slice(0,12)) { const n = clip(k,41); if (n && !G.cast[n]) G.cast[n] = clip(v,20); } }
   function applyHp(list){
     if (!Array.isArray(list)) return;
     list.forEach(h => { const pt = S.party[h?.id]; if (!pt) return; const c = clamp(parseInt(h.change)||0, -12, 10); pt.hp = clamp(pt.hp + c, 0, pt.mx); if (pt.hp <= 0) { pt.hp = 0; pt.dn = 1; } else if (c > 0) pt.dn = 0; });
@@ -723,7 +817,13 @@ ${G.log.length ? G.log.map((l,i)=>`${i+1}. ${l}`).join('\n') : '(just starting)'
     busy = true; retryFn = () => runAI(msg, fn);
     setPhase('think', 0, {msg}); Sound.music('think');
     try {
-      await fn();
+      try { await fn(); }
+      catch (e) {
+        if (['bad_key','no_credit','room_limit','not_host','wrong_password'].includes(e?.code)) throw e;
+        console.warn('DM hiccup, retrying once', e);
+        await new Promise(r => setTimeout(r, 2500));
+        await fn();
+      }
       busy = false;
     } catch (e) {
       busy = false; console.warn(e);
@@ -736,7 +836,7 @@ ${G.log.length ? G.log.map((l,i)=>`${i+1}. ${l}`).join('\n') : '(just starting)'
         no_credit:'The site’s Anthropic account is out of credit. Add credit in the Anthropic Console, then retry.',
         not_host:'This screen lost its host pass (the server may have restarted). Open a new table.'
       }[e?.code] || 'The DM tripped over the table. Retry.';
-      S.err = why; pub(); render(true);
+      S.err = why + (e?.code ? ` (${e.code})` : ''); pub(); render(true);
     }
   }
   async function aiIntro(){
@@ -751,13 +851,13 @@ TASK: Open the adventure.
 JSON: {"title":"","intros":[{"id":"","line":""}],"narration":"","question":"","recap":""}`);
     S.ttl = clip(r.title, 60) || fw().name;
     S.intros = (Array.isArray(r.intros) ? r.intros : []).filter(x => S.party[x?.id]).map(x => ({id:x.id, l:clip(x.line, 220)}));
-    S.nar = narArr(r.narration); S.q = clip(r.question, 140) || 'What do you do?';
+    S.nar = narArr(r.narration); castMerge(r.cast); S.q = clip(r.question, 140) || 'What do you do?';
     G.log.push(clip(r.recap, 200));
     Sound.music('tavern'); Sound.fx('gong');
     setPhase('party', 8 + S.intros.length*6);
   }
   async function aiOptions(){
-    const pitches = S.seats.map(s => ({id:s.id, t:clip(inp(s.id,'pitch')?.v, 200)})).filter(p => p.t);
+    const pitches = G.pitches || [];
     const k = Math.min(pitches.length, 3);
     const r = await ask(`${context()}
 
@@ -796,16 +896,18 @@ CHECK: ${o.sk} DC ${o.dc}. They rolled a natural ${rl.d}${rl.adv?' (with advanta
 TASK: Narrate the outcome, 100-160 words, 2-3 paragraphs separated by blank lines. Open with the roll's outcome and make it land; ${nextInstr}
 Also "hp": any hit point changes this caused, as [{"id":"","change":-3}] (damage -1 to -8, healing +1 to +8; usually none on a success). "inspiration": the id of at most one player whose idea or play was funniest, or null. "recap": max 25 words.
 JSON: {"narration":"","question":"","hp":[],"inspiration":null,"recap":""${kind!=='scene'?',"foe":{"name":"","hp":30,"ac":13}':''}}`);
-    S.nar = narArr(r.narration); S.q = clip(r.question, 140) || 'What now?';
+    S.nar = narArr(r.narration); castMerge(r.cast); S.q = clip(r.question, 140) || 'What now?';
     applyHp(r.hp);
     if (r.inspiration && S.party[r.inspiration]) S.party[r.inspiration].insp = Math.min(2, S.party[r.inspiration].insp + 1);
     G.log.push(clip(r.recap, 200));
     if (S.seats.every(s => S.party[s.id].dn)) return finale('tpk');
     S.scene = next;
-    if (kind === 'scene') { Sound.music('tavern'); return setPhase('pitch', 90, {foe:null}); }
+    if (kind === 'scene') { Sound.music('tavern'); return setPhase('pitch', PITCH_SECS, {foe:null}); }
     const fo = r.foe || {};
     const boss = kind === 'boss';
-    const hp = clamp(parseInt(fo.hp) || (boss?52:28), boss?40:18, boss?70:40) + (boss ? (S.seats.length-2)*6 : (S.seats.length-2)*3);
+    // enemy HP scales with party size so a solo hero and a table of six both get a fair fight
+    const np = S.seats.length;
+    const hp = boss ? 16 + 13*np + rnd(8) : 8 + 8*np + rnd(6);
     S.foe = {n: clip(fo.name, 40) || (boss ? 'The Big Bad' : 'Angry Something'), hp: Math.max(12,hp), mx: Math.max(12,hp), ac: clamp(parseInt(fo.ac)||(boss?15:13), 10, 17), boss: boss?1:0};
     G.round = 0; Sound.music('battle'); Sound.fx('gong');
     setPhase('combat', 75);
@@ -828,7 +930,7 @@ JSON: {"narration":"","question":"","hp":[],"inspiration":null,"recap":""${kind!
       task = `Narrate this round, 110-160 words, 2-3 paragraphs separated by blank lines. ${dead ? 'Include a spectacular, disgusting finishing blow from whoever hit last.' : 'The foe, beaten and humiliated, flees or surrenders in a ridiculous way.'} Then move the story on to a new situation and end with a "question" for the party, max 16 words, ending with "?".`;
       shape = `{"narration":"","question":"","hp":[],"recap":""}`;
     } else {
-      task = `Narrate this round, 90-140 words, 2 paragraphs separated by blank lines. Then the foe strikes back at 1-2 standing party members, with a one-line taunt in dialogue. Return their damage in "hp" (from -2 to -${foe.boss?10:7} each). "question": a short prompt for the next round, max 12 words.`;
+      task = `Narrate this round, 90-140 words, 2 paragraphs separated by blank lines. Then the foe strikes back at 1-2 standing party members, with a one-line taunt in dialogue. Return their damage in "hp" (from -1 to -${foe.boss ? (S.seats.length <= 2 ? 6 : 10) : (S.seats.length <= 2 ? 4 : 7)} each${S.seats.length === 1 ? '; hit the lone hero only every other round or so' : ''}). "question": a short prompt for the next round, max 12 words.`;
       shape = `{"narration":"","hp":[{"id":"","change":-4}],"question":"","recap":""}`;
     }
     const r = await ask(`${context()}
@@ -839,7 +941,7 @@ ${lines}
 
 TASK: ${task} "recap": max 25 words.
 JSON: ${shape}`);
-    S.nar = narArr(r.narration); G.log.push(clip(r.recap, 200));
+    S.nar = narArr(r.narration); castMerge(r.cast); G.log.push(clip(r.recap, 200));
     if (dead && foe.boss) return finale('win', r);
     applyHp(r.hp);
     if (S.seats.every(s => S.party[s.id].dn)) return finale('tpk');
@@ -847,7 +949,7 @@ JSON: ${shape}`);
     if (dead || flee) {
       S.foe = null; S.scene++;
       S.seats.forEach(s => { const pt = S.party[s.id]; if (pt.dn) { pt.dn = 0; pt.hp = 1; } });
-      Sound.music('tavern'); return setPhase('pitch', 90);
+      Sound.music('tavern'); return setPhase('pitch', PITCH_SECS);
     }
     Sound.music('battle');
     setPhase('combat', 75);
@@ -859,7 +961,7 @@ JSON: ${shape}`);
 
 THE WHOLE PARTY IS DOWN. Narrate their glorious, deeply embarrassing defeat and an epilogue of how the world goes on without them, 160-220 words, 3 paragraphs separated by blank lines. Then "awards": one per party member [{"id":"","title": funny award name max 5 words,"why": max 18 words}].
 JSON: {"narration":"","awards":[{"id":"","title":"","why":""}]}`);
-      S.nar = narArr(r.narration);
+      S.nar = narArr(r.narration); castMerge(r.cast);
     }
     S.awards = (Array.isArray(r?.awards) ? r.awards : []).filter(a => S.party[a?.id]).map(a => ({id:a.id, t:clip(a.title,50), w:clip(a.why,140)}));
     S.outcome = kind; S.foe = null;
@@ -871,23 +973,23 @@ JSON: {"narration":"","awards":[{"id":"","title":"","why":""}]}`);
     retryFn = null; S.err = ''; Sound.music('tavern');
     const k = G.pending;
     const endWin = () => { S.awards = []; S.outcome = 'win'; S.foe = null; return setPhase('end', 0); };
-    if (k === 'intro' || !S.ttl) { S.ttl = fw().name; S.nar = [fw().pitch]; S.q = 'What do you do first?'; return setPhase('pitch', 90); }
+    if (k === 'intro' || !S.ttl) { S.ttl = fw().name; S.nar = [fw().pitch]; S.q = 'What do you do first?'; return setPhase('pitch', PITCH_SECS); }
     if (k === 'options') {
-      const pitches = S.seats.map(s => ({id:s.id, t:clip(inp(s.id,'pitch')?.v || (P(s.id).inp?.k==='pitch' ? P(s.id).inp.v : ''), 170)})).filter(p=>p.t);
+      const pitches = (G.pitches || []).map(p => ({id:p.id, t:clip(p.t,170)}));
       S.opts = pitches.length ? pitches.slice(0,4).map(p=>({t:p.t, by:p.id, sk:pick(['Athletics','Deception','Persuasion','Stealth','Acrobatics']), dc:13})) : [{t:'Start a bar fight for no reason', by:null, sk:'Athletics', dc:12}, {t:'Lie to the nearest authority figure', by:null, sk:'Deception', dc:13}];
       return setPhase('vote', 40);
     }
     if (k === 'combat') {
       if (S.foe && S.foe.hp <= 0 && S.foe.boss) { S.nar = ['The boss collapses in a heap of its own fluids. You win. Somehow.']; return endWin(); }
       if (S.foe && S.foe.hp > 0 && G.round < 5) { S.nar = ['Steel clangs, someone screams, the fight drags on.']; S.q = 'Hit it again?'; return setPhase('combat', 75); }
-      S.foe = null; S.scene++; S.nar = ['The fight is over. Everyone pretends that went to plan.']; S.q = 'What now?'; return setPhase('pitch', 90);
+      S.foe = null; S.scene++; S.nar = ['The fight is over. Everyone pretends that went to plan.']; S.q = 'What now?'; return setPhase('pitch', PITCH_SECS);
     }
     if (k === 'tpk') { S.nar = ['Everyone is dead. The bards will sing of this, mockingly.']; S.awards = []; S.outcome = 'tpk'; return setPhase('end', 0); }
     // resolve (or anything else)
     if (S.scene >= S.n) { S.nar = ['Against all odds and good taste, you win.']; return endWin(); }
     const o = S.opts[S.win];
     S.nar = [S.roll && o ? `${resultText(S.roll.res)}! ${cname(S.roll.id)} tries to ${o.t.charAt(0).toLowerCase()+o.t.slice(1)}, and it goes ${S.roll.res==='success'||S.roll.res==='crit'?'shockingly well':'about as badly as you would expect'}.` : 'Time skips forward awkwardly.'];
-    S.q = 'What now?'; S.scene++; S.foe = null; return setPhase('pitch', 90);
+    S.q = 'What now?'; S.scene++; S.foe = null; return setPhase('pitch', PITCH_SECS);
   }
 
   /* ----- character helpers ----- */
@@ -899,12 +1001,12 @@ JSON: {"narration":"","awards":[{"id":"","title":"","why":""}]}`);
     if (!['party','pitch','vote','roll','rolled','combat','clash','think','end'].includes(S.ph) || !Object.keys(S.party).length) return '';
     return `<aside class="party" aria-label="Party">${S.seats.map(s => {
       const c = P(s.id).ch, pt = S.party[s.id] || {hp:0,mx:1};
-      const w = Math.round(100*pt.hp/pt.mx);
-      return `<div class="pcard${pt.dn?' down':''}" style="--pc:${seatColor(s.id)}">
+      const w = Math.round(100*pt.hp/pt.mx), hc = hpColor(pt.hp, pt.mx), low = !pt.dn && pt.hp/pt.mx <= .3;
+      return `<div class="pcard${pt.dn?' down':''}${low?' low':''}" style="--pc:${seatColor(s.id)};--hpc:${hc}">
         <div class="row" style="justify-content:space-between;gap:6px"><span class="nm">${esc(c?.nm||s.n)}</span>${pt.insp?`<span class="tag insp">✦ ${pt.insp}</span>`:''}</div>
         <div class="sub">${esc(c?.rc||'')} ${esc(c?.cl||'')} &middot; ${esc(s.n)} &middot; AC ${c?sheet(c).ac:'?'}</div>
-        <div class="hpbar" aria-label="HP ${pt.hp} of ${pt.mx}"><i style="width:${w}%;background-position:${w}% 0"></i></div>
-        <div class="sub mono" style="font-size:1rem">${pt.dn?'DOWN ☠':`HP ${pt.hp}/${pt.mx}`}</div>
+        <div class="hpbar" aria-label="HP ${pt.hp} of ${pt.mx}"><i style="width:${w}%"></i></div>
+        <div class="hpnum">${pt.dn?'DOWN ☠':`HP ${pt.hp}/${pt.mx}${low?' · HURTING':''}`}</div>
       </div>`; }).join('')}</aside>`;
   }
   function head(){
@@ -934,6 +1036,7 @@ JSON: {"narration":"","awards":[{"id":"","title":"","why":""}]}`);
         <div class="stack" style="gap:8px"><div class="label">DM brain</div><div class="chips">
           <button class="chip" data-brain="clever" aria-pressed="${G.brain==='clever'}">Clever (funnier, slower pauses)</button>
           <button class="chip" data-brain="fast" aria-pressed="${G.brain==='fast'}">Snappy (quicker, simpler)</button></div></div>
+        <div class="stack" style="gap:8px"><div class="label">DM voices</div><div class="row"><button class="btn small ghost" id="testVoice">Test the voices</button><span class="muted">${Voice.ok ? 'Uses this computer\u2019s built-in voices. Chrome or Edge usually sound best.' : 'This browser has no built-in voices, so the DM will stay silent.'}</span></div></div>
         ${SERVER.mock ? '<p class="err">Test mode: the server has no Anthropic API key, so the DM gives canned replies.</p>' : ''}
         <div class="row"><button class="btn big" id="startBtn" ${S.seats.length?'':'disabled'}>Start the game</button><span class="muted">${S.seats.length}/6 seated</span></div>
       </div>`;
@@ -994,12 +1097,14 @@ JSON: {"narration":"","awards":[{"id":"","title":"","why":""}]}`);
     if (!el) return;
     const full = arr || []; let pi = 0, ci = 0;
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) { el.innerHTML = paras(full); return; }
-    el.innerHTML = full.map(()=>'<p></p>').join('');
-    const ps = $$('p', el);
+    // NPC lines get their own styled paragraph with the speaker's name; only the words type out
+    const parts = full.map(line => { const n = isNpc(line) && npcSplit(line); return n ? {npc:n.who, t:'\u201c' + n.say + '\u201d'} : {t:line}; });
+    el.innerHTML = parts.map(x => x.npc ? `<p class="npc"><b>${esc(x.npc)}</b> <span></span></p>` : '<p><span></span></p>').join('');
+    const spans = $$('p > span', el);
     typeTimer = setInterval(() => {
-      if (pi >= full.length) { clearInterval(typeTimer); return; }
-      ci += 2; ps[pi].textContent = full[pi].slice(0, ci);
-      if (ci >= full[pi].length) { pi++; ci = 0; }
+      if (pi >= parts.length) { clearInterval(typeTimer); return; }
+      ci += 2; spans[pi].textContent = parts[pi].t.slice(0, ci);
+      if (ci >= parts[pi].t.length) { pi++; ci = 0; }
     }, 22);
   }
   function render(full){
@@ -1009,11 +1114,13 @@ JSON: {"narration":"","awards":[{"id":"","title":"","why":""}]}`);
       lastPid = S.pid;
       const rail = partyRail();
       app.innerHTML = `<div class="tv">${head()}<div class="tv-body ${rail?'':'solo'}"><main class="panel stage" id="stage">${stageHTML()}</main>${rail}</div></div>
-        <div class="controls"><button class="btn small ghost" id="muteBtn">${Sound.muted?'Sound off':'Sound on'}</button>${S.end?'<button class="btn small ghost" id="hurryBtn">Hurry up</button>':''}<button class="btn small ghost" id="quitBtn">Quit</button></div>`;
+        <div class="controls"><button class="btn small ghost" id="muteBtn">${Sound.muted?'Sound off':'Sound on'}</button>${'speechSynthesis' in window?`<button class="btn small ghost" id="voiceBtn">${Voice.on?'Voices on':'Voices off'}</button>`:''}${S.end?'<button class="btn small ghost" id="hurryBtn">Hurry up</button>':''}<button class="btn small ghost" id="quitBtn">Quit</button></div>`;
       wire();
       if ($('#nar')) typewrite($('#nar'), S.nar);
       if (S.ph === 'think') startThinkLines(); else clearInterval(thinkTimer);
       if (S.ph === 'rolled') animateRoll();
+      Voice.stop();
+      const lines = spoken(); if (lines.length) Voice.say(lines, G.cast || {});
       tick();
     } else {
       // light refresh: only the bits that change inside a phase
@@ -1022,9 +1129,16 @@ JSON: {"narration":"","awards":[{"id":"","title":"","why":""}]}`);
       const rail = $('aside.party'); if (rail) rail.outerHTML = partyRail();
     }
   }
+  function spoken(){
+    if (S.ph === 'party') return (S.intros||[]).map(x => `${cname(x.id)}. ${x.l}`);
+    if (S.ph === 'pitch' || S.ph === 'combat') return [...S.nar, S.q];
+    if (S.ph === 'end') return [...S.nar, ...(S.awards||[]).map(a => `${cname(a.id)} wins ${a.t}. ${a.w}`)];
+    return [];
+  }
   function animateRoll(){
     const n = $('#dieN'), dieEl = $('#bigdie'), r = S.roll; if (!n || !r) return;
     let k = 0; const iv = setInterval(() => { n.textContent = die(20); if (++k > 14) { clearInterval(iv); dieEl.classList.remove('rolling'); n.textContent = r.d;
+      if (r.res === 'crit' || r.res === 'fumble') Voice.say([r.res === 'crit' ? 'Natural twenty!' : 'Natural one. Oh no.']);
       $('#rollOut').innerHTML = `<div class="result ${r.res}">${resultText(r.res)}</div><div class="math">${r.adv?`advantage [${r.dice.join(', ')}] → `:''}${r.d} ${sgn(r.m)} = ${r.tot} vs DC ${S.ck.dc}${r.auto?' (auto-rolled)':''}</div>`; } }, 95);
   }
   function startThinkLines(){
@@ -1034,6 +1148,8 @@ JSON: {"narration":"","awards":[{"id":"","title":"","why":""}]}`);
   }
   function wire(){
     $('#muteBtn') && ($('#muteBtn').onclick = e => { const m = Sound.toggle(); e.target.textContent = m ? 'Sound off' : 'Sound on'; });
+    $('#voiceBtn') && ($('#voiceBtn').onclick = e => { const v = Voice.toggle(); e.target.textContent = v ? 'Voices on' : 'Voices off'; });
+    $('#testVoice') && ($('#testVoice').onclick = () => { Sound.init(); Voice.sample(); });
     $('#hurryBtn') && ($('#hurryBtn').onclick = () => { S.end = Date.now() + 5000; pub(); });
     $('#quitBtn') && ($('#quitBtn').onclick = e => {
       if (e.target.dataset.sure) { store.del('rfs-host'); NR?.leave?.(); location.reload(); }
@@ -1101,10 +1217,19 @@ const Phone = (() => {
       <div class="kv"><span>Moves: <b>${esc(sh.cls.moves.join(', '))}</b></span></div>
       <div class="muted" style="font-size:.9rem">${pt?.insp?'You have Inspiration: spend it for advantage on your next roll.':'Earn Inspiration by being the funniest. Spend it for advantage.'}</div></div></details>`;
   }
+  function myHP(){
+    const pt = S.party?.[me.id]; if (!pt || ['lobby','madlibs','reveal','chargen','framework'].includes(S.ph)) return '';
+    const w = Math.round(100*pt.hp/pt.mx), low = !pt.dn && pt.hp/pt.mx <= .3;
+    return `<div class="myhp${low?' low':''}${pt.dn?' down':''}" style="--hpc:${hpColor(pt.hp,pt.mx)}" role="status" aria-label="Your HP ${pt.hp} of ${pt.mx}">
+      <div class="top"><span class="label" style="color:inherit">${esc(me.ch?.nm||me.nm)}</span><span class="big">${pt.dn?'DOWN ☠':`${pt.hp}<span style="font-size:1.2rem;color:var(--dim)">/${pt.mx} HP</span>`}</span></div>
+      <div class="hpbar"><i style="width:${w}%"></i></div>
+      ${low?'<div class="hpnum">You\u2019re badly hurt. Maybe let someone else go first.</div>':''}${pt.insp?`<div class="hpnum" style="color:var(--mead)">✦ ${pt.insp} Inspiration: tick the box on a roll for advantage</div>`:''}
+    </div>`;
+  }
   function wrap(inner, bar = ''){
     return `<div class="phone"><div class="phead"><div class="logo chrome" style="font-family:var(--f-black)">Dummies & Dragons</div><div class="mono" id="ptimer" style="font-size:1.6rem"></div></div>
       <div class="me"><span class="dot" style="--pc:${color()}"></span><span>${esc(me.nm)} &middot; table ${esc(code)}</span></div>
-      ${inner}${['lobby','madlibs','reveal','chargen'].includes(S.ph)?'':sheetBlock()}</div>${bar?`<div class="bar">${bar}</div>`:''}`;
+      ${myHP()}${inner}${['lobby','madlibs','reveal','chargen'].includes(S.ph)?'':sheetBlock()}</div>${bar?`<div class="bar">${bar}</div>`:''}`;
   }
   let lastSeated = null;
   function render(force){
@@ -1238,7 +1363,7 @@ const Phone = (() => {
     $$('[data-fw]').forEach(b => b.onclick = () => submit('fw', {v:b.dataset.fw}));
     $$('[data-vote]').forEach(b => b.onclick = () => submit('vote', {v:parseInt(b.dataset.vote)}));
     const pi = $('#pitchIn');
-    if (pi) { const upd = () => { draft.pitch = pi.value; $('#pitchCount').textContent = pi.value.length + '/200'; }; pi.oninput = upd; upd(); }
+    if (pi) { let dt; const upd = () => { draft.pitch = pi.value; $('#pitchCount').textContent = pi.value.length + '/200'; clearTimeout(dt); dt = setTimeout(() => send({draft:{pid:S.pid, v:pi.value.slice(0,200)}}), 500); }; pi.oninput = upd; upd(); }
     $('#pitchSend') && ($('#pitchSend').onclick = () => { const v = clip(pi.value, 200); if (!v) return toast('Pitch something, coward'); draft.pitch = ''; submit('pitch', {v}); });
     $('#pitchEdit') && ($('#pitchEdit').onclick = () => { draft.pitch = me.inp?.v || ''; me.inp = null; send({inp:null}); render(true); });
     $('#rollBtn') && ($('#rollBtn').onclick = () => { Sound.fx('dice'); submit('roll', {d: rollDice()}); });

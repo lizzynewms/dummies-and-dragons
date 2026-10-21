@@ -22,7 +22,7 @@ const MAX_MSG = 64 * 1024;
 
 /* ---------------- static files ---------------- */
 const PUB = path.join(__dirname, 'public');
-const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon', '.json': 'application/json' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon', '.json': 'application/json', '.woff2': 'font/woff2', '.txt': 'text/plain' };
 function serveStatic(req, res) {
   let p = decodeURIComponent(new URL(req.url, 'http://x').pathname);
   if (p === '/' || /^\/[A-Za-z]{4}$/.test(p)) p = '/index.html'; // /ABCD deep links to a room
@@ -108,7 +108,7 @@ async function callClaude(prompt, fast) {
   const r = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: { 'content-type': 'application/json', 'x-api-key': API_KEY, 'anthropic-version': '2023-06-01' },
-    body: JSON.stringify({ model: fast ? MODEL_FAST : MODEL_SMART, max_tokens: 1600, temperature: 1, messages: [{ role: 'user', content: prompt }] })
+    body: JSON.stringify({ model: fast ? MODEL_FAST : MODEL_SMART, max_tokens: 2500, temperature: 1, messages: [{ role: 'user', content: prompt }] })
   });
   const data = await r.json().catch(() => ({}));
   if (!r.ok) {
@@ -127,9 +127,17 @@ async function dm(req, res) {
   room.aiCalls++; room.lastActive = Date.now();
   if (MOCK) return send(res, 200, { data: mockDM(body.prompt) });
   try {
-    let text = await callClaude(body.prompt, !!body.fast), data = extractJSON(text);
+    let text;
+    try { text = await callClaude(body.prompt, !!body.fast); }
+    catch (e) {                                   // one quick retry for hiccups
+      if (!['overloaded', 'upstream_error'].includes(e.code)) throw e;
+      console.warn('[dm] retrying after', e.code, e.message);
+      await new Promise(r => setTimeout(r, 1500));
+      text = await callClaude(body.prompt, !!body.fast);
+    }
+    let data = extractJSON(text);
     if (!data) { text = await callClaude(body.prompt + '\n\nIMPORTANT: Reply with ONLY one valid JSON object, no other text.', true); data = extractJSON(text); }
-    if (!data) return send(res, 502, { error: 'invalid_json' });
+    if (!data) { console.error('[dm] unparseable reply:', String(text).slice(0, 300)); return send(res, 502, { error: 'invalid_json' }); }
     send(res, 200, { data });
   } catch (e) {
     console.error('[dm]', e.code, e.message);
@@ -146,7 +154,8 @@ function mockDM(prompt) {
   if (prompt.includes('TASK: Open the adventure')) return {
     title: `The Night of ${w(0)}`,
     intros: ids.map(id => ({ id, line: 'Smells like regret and cheap mead, and somehow everyone is into it.' })),
-    narration: `[MOCK DM] You stumble into ${w(0)}, a tavern so sticky your boots squeak. The barkeep is slicing ${w(1)}.\n\nA hooded figure in the corner whispers that the deed to this dump is gone.`,
+    narration: `[MOCK DM] You stumble into ${w(0)}, a tavern so sticky your boots squeak. The barkeep is slicing ${w(1)}.\n\nA hooded figure in the corner whispers that the deed to this dump is gone.\n\nGrumbo the Barkeep: "Oi! Wipe your boots, you animals."\n\nLady Gristle: "Darling, is that a goblin or your husband?"`,
+    cast: { 'Grumbo the Barkeep': 'gravelly', 'Lady Gristle': 'posh' },
     question: 'What do you do first?', recap: 'The party arrived at the tavern and learned the deed is missing.' };
   if (prompt.includes('Turn ') && prompt.includes('options')) return {
     options: [...pitchIds.slice(0, 3).map((id, i) => ({ text: `Punched-up pitch number ${i + 1}`, by: id, skill: ['Persuasion', 'Stealth', 'Athletics'][i], dc: 12 + i })),
